@@ -1,0 +1,1434 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>因式分解學習系統</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            chtml: {
+                scale: 1.1 // 稍微放大數學公式
+            }
+        };
+    </script>
+  
+  <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-color: #38bdf8; /* Sky 400 */
+            --primary-hover: #0ea5e9; /* Sky 500 */
+            --success-color: #4ade80; /* Green 400 */
+            --success-hover: #22c55e; /* Green 500 */
+            --danger-color: #f87171; /* Red 400 */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --card-radius: 16px;
+            --btn-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* 背景裝飾圓形 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 動畫 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-area, .main-menu, .test-area {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* 標題區域 */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* 主選單 */
+        .main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+
+        .menu-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .menu-card p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--btn-radius);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #0f172a;
+        }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-success {
+            background: var(--success-color);
+            color: #064e3b;
+        }
+        .btn-success:hover { background: var(--success-hover); }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+        }
+
+        /* 內容區域通用 */
+        .content-area, .test-area {
+            display: none;
+            width: 100%;
+        }
+
+        .content-area.active, .test-area.active {
+            display: block;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* 例題展示 */
+        .example-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .example-problem {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .example-problem::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .example-problem h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .math-content {
+            font-size: 1.5rem;
+            margin: 15px 0;
+        }
+
+        .example-steps {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .example-steps h4 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .step:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .navigation .btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            min-width: 100px;
+        }
+        .navigation .btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        /* 測驗區域 */
+        .question-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .answer-preview {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        
+        .answer-preview:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        .answer-preview.empty {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+        }
+
+        /* 隱藏真實輸入框但保持可聚焦 */
+        .answer-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+        }
+
+        /* 鍵盤區域 */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 25px;
+        }
+
+        .keypad-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            color: var(--text-main);
+            padding: 0;
+            height: 55px; /* 增加點擊區域 */
+            font-size: 1.1rem;
+            font-family: 'Roboto Mono', monospace;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .keypad-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* 數字鍵 */
+        .keypad-btn.number {
+            background: rgba(56, 189, 248, 0.15);
+            color: #bae6fd;
+            border-color: rgba(56, 189, 248, 0.2);
+            font-weight: bold;
+        }
+        
+        /* 變數鍵 */
+        .keypad-btn.variable {
+            color: #e2e8f0;
+            font-style: italic;
+            font-family: serif;
+        }
+
+        /* 運算符 */
+        .keypad-btn.operator {
+            background: rgba(255, 255, 255, 0.03);
+            color: #f1f5f9;
+        }
+
+        /* 功能鍵 */
+        .keypad-btn.clear {
+            grid-column: span 2;
+            background: rgba(248, 113, 113, 0.2);
+            color: #fca5a5;
+            border-color: rgba(248, 113, 113, 0.3);
+        }
+
+        /* 學生資料表單 */
+        .student-info {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* 結果頁面 */
+        .results-container {
+            background: var(--glass-bg);
+            border-radius: var(--card-radius);
+            padding: 30px;
+        }
+
+        #score-summary {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            color: var(--success-color);
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ccc;
+        }
+
+        .result-item.correct {
+            border-left-color: var(--success-color);
+            background: linear-gradient(to right, rgba(74, 222, 128, 0.05), transparent);
+        }
+
+        .result-item.incorrect {
+            border-left-color: var(--danger-color);
+            background: linear-gradient(to right, rgba(248, 113, 113, 0.05), transparent);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.8rem; }
+            .keypad { 
+                grid-template-columns: repeat(5, 1fr); 
+                gap: 8px;
+            }
+            .keypad-btn { height: 48px; font-size: 1rem; }
+            /* 行動版鍵盤佈局調整：讓清除鍵換行 */
+            .keypad-btn.clear { grid-column: span 5; }
+            
+            .step .math-content {
+                font-size: 1rem;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body>
+  <div class="container">
+   <div class="header">
+    <h1 id="app-title">因式分解學習系統</h1>
+    <p id="welcome-text">歡迎使用互動式數學學習平台</p>
+   </div>
+   
+   <div id="main-menu" class="main-menu">
+    <div class="menu-card" onclick="showExamples('factoring')">
+     <div>
+        <h2>提取公因式</h2>
+        <p>學習觀察表達式結構，找出各項之間的公因數或公因式，將多項式轉化為乘積形式。</p>
+     </div>
+     <div class="button-group">
+        <button class="btn btn-primary">查看例題</button> 
+        <button class="btn btn-success" onclick="event.stopPropagation(); startTest('factoring')">開始測驗</button>
+     </div>
+    </div>
+    
+    <div class="menu-card" onclick="showExamples('grouping')">
+     <div>
+        <h2>併項法</h2>
+        <p>學習將多項式適當分組，通過組內提取公因式，進而實現整體的因式分解。</p>
+     </div>
+     <div class="button-group">
+        <button class="btn btn-primary">查看例題</button> 
+        <button class="btn btn-success" onclick="event.stopPropagation(); startTest('grouping')">開始測驗</button>
+     </div>
+    </div>
+   </div>
+   
+   <div id="examples-area" class="content-area">
+    <button class="btn back-btn" onclick="showMainMenu()">← 返回主選單</button>
+    <div class="question-counter"><span id="example-counter">第 1 題，共 12 題</span></div>
+    
+    <div class="example-container">
+     <div class="example-problem">
+      <h3>題目</h3>
+      <div id="example-problem" class="math-content">$$5a+5b$$</div>
+     </div>
+     
+     <div class="example-steps">
+      <h4>解題步驟</h4>
+      <div id="example-steps"></div>
+     </div>
+    </div>
+    
+    <div class="navigation">
+        <button class="btn" onclick="previousExample()">上一題</button> 
+        <button class="btn" onclick="nextExample()">下一題</button>
+    </div>
+   </div>
+   
+   <div id="test-area" class="test-area">
+    <button class="btn back-btn" onclick="showMainMenu()">← 返回主選單</button>
+    <div class="question-counter"><span id="test-counter">第 1 題，共 12 題</span></div>
+    
+    <div class="question-container">
+     <h3 style="color:var(--text-muted); margin-top:0;">請進行因式分解：</h3>
+     <div id="test-question" class="math-content">$$5a+5b$$</div>
+     
+     <input type="text" id="answer-input" class="answer-input" placeholder="請輸入答案" readonly>
+     
+     <div class="answer-preview empty" id="answer-preview">
+      點擊下方按鍵輸入
+     </div>
+     
+     <div class="keypad">
+         <button class="keypad-btn variable" onclick="addToAnswer('a')">\(a\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('b')">\(b\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('c')">\(c\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('m')">\(m\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('n')">\(n\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('x')">\(x\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('y')">\(y\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('z')">\(z\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('p')">\(p\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('q')">\(q\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('r')">\(r\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('s')">\(s\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('t')">\(t\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('h')">\(h\)</button> 
+         <button class="keypad-btn variable" onclick="addToAnswer('k')">\(k\)</button> 
+         
+         <button class="keypad-btn operator" onclick="addToAnswer('^2')">\(x^2\)</button> 
+         <button class="keypad-btn operator" onclick="addToAnswer('(')">\((\)</button> 
+         <button class="keypad-btn operator" onclick="addToAnswer(')')">\()\)</button> 
+         <button class="keypad-btn operator" onclick="addToAnswer('+')">\(+\)</button> 
+         <button class="keypad-btn operator" onclick="addToAnswer('-')">\(-\)</button> 
+         
+         <button class="keypad-btn number" onclick="addToAnswer('1')">1</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('2')">2</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('3')">3</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('4')">4</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('5')">5</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('6')">6</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('7')">7</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('8')">8</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('9')">9</button> 
+         <button class="keypad-btn number" onclick="addToAnswer('0')">0</button> 
+         
+         <button class="keypad-btn clear" onclick="clearAnswer()">清除全部</button>
+     </div>
+     
+     <button class="btn btn-primary" style="width: 100%; max-width: 300px;" onclick="submitAnswer()">提交答案</button>
+    </div>
+   </div>
+   
+   <div id="student-info-area" class="content-area">
+    <button class="btn back-btn" onclick="showMainMenu()">取消並返回</button>
+    <div class="student-info">
+     <h2 style="text-align:center; color: var(--primary-color);">恭喜完成測驗！</h2>
+     <p style="text-align:center; color: var(--text-muted); margin-bottom: 30px;">請輸入您的資料以保存成績</p>
+     
+     <div class="form-group">
+        <label for="student-class">班別</label> 
+        <select id="student-class"> 
+            <option value="">請選擇班別</option> 
+        </select>
+     </div>
+     
+     <div class="form-group">
+        <label for="student-number">學號</label> 
+        <input type="number" id="student-number" min="1" max="40" placeholder="例如: 15">
+     </div>
+     
+     <button class="btn btn-success" style="width:100%" onclick="saveResults()">保存並查看結果</button>
+    </div>
+   </div>
+   
+   <div id="results-area" class="content-area">
+    <div class="results-container">
+     <h2 style="text-align:center; margin-bottom:30px;">測驗詳細結果</h2>
+     <div id="score-summary"></div>
+     <div id="detailed-results"></div>
+     <div style="text-align:center; margin-top:30px;">
+        <button class="btn btn-primary" onclick="showMainMenu()">返回主選單</button>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <script>
+        // 數據處理器
+        const dataHandler = {
+            onDataChanged(data) {
+                console.log('數據已更新:', data.length, '筆記錄');
+            }
+        };
+
+        // 初始化數據SDK
+        async function initializeDataSdk() {
+            if (window.dataSdk) {
+                const result = await window.dataSdk.init(dataHandler);
+                if (!result.isOk) {
+                    console.error('數據SDK初始化失敗');
+                }
+            }
+        }
+
+        // 提取公因式例題
+        const factoringExamples = [
+            {
+                problem: "5a+5b",
+                steps: ["5a+5b", "=5(a+b)"]
+            },
+            {
+                problem: "12p-16q",
+                steps: ["12p-16q", "=4(3p-4q)"]
+            },
+            {
+                problem: "-8-4a",
+                steps: ["-8-4a", "=-4(2+a)"]
+            },
+            {
+                problem: "4a-ab",
+                steps: ["4a-ab", "=a(4-b)"]
+            },
+            {
+                problem: "6xy-9y",
+                steps: ["6xy-9y", "=3y(2x-3)"]
+            },
+            {
+                problem: "5p^2q-10pq^2",
+                steps: ["5p^2q-10pq^2", "=5pq(p-2q)"]
+            },
+            {
+                problem: "-2m^2-4mn-2n",
+                steps: ["-2m^2-4mn-2n", "=-2m(m+2n+1)"]
+            },
+            {
+                problem: "h(k-7)+4(k-7)",
+                steps: ["h(k-7)+4(k-7)", "=(k-7)(h+4)"]
+            },
+            {
+                problem: "4a(b-3)-b(3-b)",
+                steps: ["4a(b-3)-b(3-b)", "=4a(b-3)+b(b-3)", "=(b-3)(4a+b)"]
+            },
+            {
+                problem: "(k+1)(m-n)+2k(m-n)",
+                steps: ["(k+1)(m-n)+2k(m-n)", "=(m-n)(k+1+2k)", "=(m-n)(3k+1)"]
+            },
+            {
+                problem: "(4m-7n)^2+n(4m-7n)",
+                steps: ["(4m-7n)^2+n(4m-7n)", "=(4m-7n)(4m-7n+n)", "=(4m-7n)(4m-6n)", "=2(4m-7n)(2m-3n)"]
+            },
+            {
+                problem: "3(a-b)(3r-t)+9(b-a)(2t-5s)",
+                steps: ["3(a-b)(3r-t)+9(b-a)(2t-5s)", "=3(a-b)(3r-t)-9(a-b)(2t-5s)", "=3(a-b)[3r-t-3(2t-5s)]", "=3(a-b)(3r-t-6t+15s)", "=3(a-b)(3r-7t+15s)"]
+            }
+        ];
+
+        // 併項法例題
+        const groupingExamples = [
+            {
+                problem: "3x+3y+xz+yz",
+                steps: ["3x+3y+xz+yz", "=3(x+y)+z(x+y)", "=(x+y)(3+z)"]
+            },
+            {
+                problem: "pq+p+q+1",
+                steps: ["pq+p+q+1", "=p(q+1)+(q+1)", "=(q+1)(p+1)"]
+            },
+            {
+                problem: "ab+7a^2-7a-b",
+                steps: ["ab+7a^2-7a-b", "=a(b+7a)-(7a+b)", "=(b+7a)(a-1)"]
+            },
+            {
+                problem: "mx-m^2+my-xy",
+                steps: ["mx-m^2+my-xy", "=m(x-m)-y(x-m)", "=(x-m)(m-y)"]
+            },
+            {
+                problem: "4ac+4bc-5ad-5bd",
+                steps: ["4ac+4bc-5ad-5bd", "=4c(a+b)-5d(a+b)", "=(a+b)(4c-5d)"]
+            },
+            {
+                problem: "2b^2-6ab-b+3a",
+                steps: ["2b^2-6ab-b+3a", "=2b(b-3a)-(b-3a)", "=(b-3a)(2b-1)"]
+            },
+            {
+                problem: "r^3-6x^3-3r^2x^2+2rx",
+                steps: ["r^3-6x^3-3r^2x^2+2rx", "=r^3-3r^2x^2+2rx-6x^3", "=r^2(r-3x^2)+2x(r-3x^2)", "=(r-3x^2)(r^2+2x)"]
+            },
+            {
+                problem: "4x^3+2x^2+16x+8",
+                steps: ["4x^3+2x^2+16x+8", "=2(2x^3+x^2+8x+4)", "=2[x^2(2x+1)+4(2x+1)]", "=2(2x+1)(x^2+4)"]
+            }
+        ];
+
+        // 全局變量
+        let currentExampleIndex = 0;
+        let currentExampleType = '';
+        let currentTestIndex = 0;
+        let currentTestType = '';
+        let testQuestions = [];
+        let userAnswers = [];
+        let correctAnswers = [];
+
+        // 生成班別選項
+        function generateClassOptions() {
+            const select = document.getElementById('student-class');
+            for (let grade = 1; grade <= 6; grade++) {
+                for (let cls of ['A', 'B', 'C', 'D']) {
+                    const option = document.createElement('option');
+                    option.value = `${grade}${cls}`;
+                    option.textContent = `${grade}${cls}`;
+                    select.appendChild(option);
+                }
+            }
+        }
+
+        // 顯示例題
+        function showExamples(type) {
+            currentExampleType = type;
+            currentExampleIndex = 0;
+            
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('examples-area').classList.add('active');
+            
+            updateExample();
+        }
+
+        // 更新例題顯示
+        function updateExample() {
+            const examples = currentExampleType === 'factoring' ? factoringExamples : groupingExamples;
+            const example = examples[currentExampleIndex];
+            
+            document.getElementById('example-counter').textContent = 
+                `第 ${currentExampleIndex + 1} 題，共 ${examples.length} 題`;
+            
+            document.getElementById('example-problem').innerHTML = `$$${example.problem}$$`;
+            
+            // 找到第一行等號前的部分長度來對齊
+            const firstStep = example.steps[0];
+            const firstStepParts = firstStep.split('=');
+            const leftPart = firstStepParts[0];
+            
+            const stepsHtml = example.steps.map((step, index) => {
+                if (index === 0) {
+                    return `<div class="step"><span class="math-content">$$${step}$$</span></div>`;
+                } else {
+                    // 使用固定寬度的隱藏文字來對齊等號
+                    const parts = step.split('=');
+                    if (parts.length > 1) {
+                        return `<div class="step"><span class="math-content" style="display: inline-block; width: 0; overflow: hidden; height:0;">$$${leftPart}$$</span><span class="math-content">$$${step}$$</span></div>`;
+                    } else {
+                        return `<div class="step"><span class="math-content">$$${step}$$</span></div>`;
+                    }
+                }
+            }).join('');
+            document.getElementById('example-steps').innerHTML = stepsHtml;
+            
+            // 重新渲染MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 上一個例題
+        function previousExample() {
+            const examples = currentExampleType === 'factoring' ? factoringExamples : groupingExamples;
+            if (currentExampleIndex > 0) {
+                currentExampleIndex--;
+                updateExample();
+            }
+        }
+
+        // 下一個例題
+        function nextExample() {
+            const examples = currentExampleType === 'factoring' ? factoringExamples : groupingExamples;
+            if (currentExampleIndex < examples.length - 1) {
+                currentExampleIndex++;
+                updateExample();
+            }
+        }
+
+        // 題型生成器 - 動態生成題目
+        const factoringGenerators = [
+            // 類型1: 簡單公因式 (參照例題1: 5a+5b)
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 7) + 2; // 2-8
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n', 'c', 'd'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff}${var1}+${coeff}${var2}`;
+                    const answer = `${coeff}(${var1}+${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型2: 係數公因式 (參照例題2: 12p-16q)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4, 5, 6][Math.floor(Math.random() * 5)];
+                    const coeff1 = gcd * (Math.floor(Math.random() * 4) + 2); // 2-5倍
+                    const coeff2 = gcd * (Math.floor(Math.random() * 4) + 2);
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff1}${var1}-${coeff2}${var2}`;
+                    const answer = `${gcd}(${coeff1/gcd}${var1}-${coeff2/gcd}${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型3: 負號公因式 (參照例題3: -8-4a)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                    const coeff1 = gcd * (Math.floor(Math.random() * 3) + 2); // 2-4倍
+                    const coeff2 = gcd;
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `-${coeff1}-${coeff2}${var1}`;
+                    const answer = `-${gcd}(${coeff1/gcd}+${var1})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型4: 變數公因式 (參照例題4: 4a-ab)
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 6) + 3; // 3-8
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff}${var1}-${var1}${var2}`;
+                    const answer = `${var1}(${coeff}-${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型5: 變數係數公因式 (參照例題5: 6xy-9y)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                    const coeff1 = gcd * (Math.floor(Math.random() * 3) + 2); // 2-4倍
+                    const coeff2 = gcd * (Math.floor(Math.random() * 3) + 2);
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff1}${var1}${var3}-${coeff2}${var3}`;
+                    const answer = `${gcd}${var3}(${coeff1/gcd}${var1}-${coeff2/gcd})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型6: 高次項公因式 (參照例題6: 5p^2q-10pq^2)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                    const coeff1 = gcd * (Math.floor(Math.random() * 3) + 2);
+                    const coeff2 = gcd * (Math.floor(Math.random() * 3) + 2);
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff1}${var1}^2${var2}-${coeff2}${var1}${var2}^2`;
+                    const answer = `${gcd}${var1}${var2}(${coeff1/gcd}${var1}-${coeff2/gcd}${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型7: 複雜負號公因式 (參照例題7: -2m^2-4mn-2n)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4][Math.floor(Math.random() * 3)];
+                    const vars = ['a', 'b', 'x', 'y', 'm', 'n', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `-${gcd}${var1}^2-${gcd*2}${var1}${var2}-${gcd}${var2}`;
+                    const answer = `-${gcd}(${var1}^2+2${var1}${var2}+${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型8: 括號公因式 (參照例題8: h(k-7)+4(k-7))
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 6) + 2; // 2-7
+                    const num = Math.floor(Math.random() * 8) + 2; // 2-9
+                    const vars = ['a', 'b', 'x', 'y', 'k', 'm', 'p', 'q', 'h', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${var1}(${var2}-${num})+${coeff}(${var2}-${num})`;
+                    const answer = `(${var2}-${num})(${var1}+${coeff})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型9: 符號變換公因式 (參照例題9: 4a(b-3)-b(3-b))
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 5) + 2; // 2-6
+                    const num = Math.floor(Math.random() * 6) + 2; // 2-7
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff}${var1}(${var2}-${num})-${var2}(${num}-${var2})`;
+                    const answer = `(${var2}-${num})(${coeff}${var1}+${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型10: 複雜括號公因式 (參照例題10: (k+1)(m-n)+2k(m-n))
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 4) + 1; // 1-4
+                    const coeff2 = Math.floor(Math.random() * 4) + 2; // 2-5
+                    const vars = ['a', 'b', 'x', 'y', 'k', 'm', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    let var4 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var4 === var1 || var4 === var2 || var4 === var3) var4 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `(${var1}+${coeff1})(${var2}-${var3})+${coeff2}${var1}(${var2}-${var3})`;
+                    const answer = `(${var2}-${var3})(${var1}+${coeff1}+${coeff2}${var1})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型11: 平方項公因式 (參照例題11: (4m-7n)^2+n(4m-7n))
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 4) + 2; // 2-5
+                    const coeff2 = Math.floor(Math.random() * 4) + 2; // 2-5
+                    const vars = ['a', 'b', 'x', 'y', 'm', 'n', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `(${coeff1}${var1}-${coeff2}${var2})^2+${var1}(${coeff1}${var1}-${coeff2}${var2})`;
+                    const answer = `(${coeff1}${var1}-${coeff2}${var2})(${coeff1}${var1}-${coeff2}${var2}+${var1})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型12: 複雜符號變換 (參照例題12: 3(a-b)(3r-t)+9(b-a)(2t-5s))
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 3) + 2; // 2-4
+                    const coeff2 = coeff1 * (Math.floor(Math.random() * 3) + 2); // 2-3倍
+                    const vars = ['a', 'b', 'x', 'y', 'r', 't', 's', 'p'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    let var4 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var4 === var1 || var4 === var2 || var4 === var3) var4 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const num1 = Math.floor(Math.random() * 3) + 2;
+                    const num2 = Math.floor(Math.random() * 3) + 2;
+                    
+                    const problem = `${coeff1}(${var1}-${var2})(${num1}${var3}-${var4})+${coeff2}(${var2}-${var1})(${num2}${var4}-${var3})`;
+                    const answer = `${coeff1}(${var1}-${var2})(${num1}${var3}-${var4}-${coeff2/coeff1}(${num2}${var4}-${var3}))`;
+                    return { problem, answer };
+                }
+            }
+        ];
+
+        // 併項法題型生成器
+        const groupingGenerators = [
+            // 類型1: 基本併項 (參照例題1: 3x+3y+xz+yz)
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 6) + 2; // 2-7
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n', 'c', 'd'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff}${var1}+${coeff}${var2}+${var1}${var3}+${var2}${var3}`;
+                    const answer = `(${var1}+${var2})(${coeff}+${var3})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型2: 加1項併項 (參照例題2: pq+p+q+1)
+            {
+                generate: () => {
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${var1}${var2}+${var1}+${var2}+1`;
+                    const answer = `(${var1}+1)(${var2}+1)`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型3: 重新排列併項 (參照例題3: ab+7a^2-7a-b)
+            {
+                generate: () => {
+                    const coeff = Math.floor(Math.random() * 6) + 3; // 3-8
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${var1}${var2}+${coeff}${var1}^2-${coeff}${var1}-${var2}`;
+                    const answer = `(${var2}+${coeff}${var1})(${var1}-1)`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型4: 變數順序調整 (參照例題4: mx-m^2+my-xy)
+            {
+                generate: () => {
+                    const vars = ['a', 'b', 'x', 'y', 'm', 'n', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${var1}${var2}-${var1}^2+${var1}${var3}-${var2}${var3}`;
+                    const answer = `(${var2}-${var1})(${var1}-${var3})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型5: 係數併項 (參照例題5: 4ac+4bc-5ad-5bd)
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 5) + 2; // 2-6
+                    const coeff2 = Math.floor(Math.random() * 5) + 2; // 2-6
+                    const vars = ['a', 'b', 'c', 'd', 'x', 'y', 'p', 'q'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    let var3 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var3 === var1 || var3 === var2) var3 = vars[Math.floor(Math.random() * vars.length)];
+                    let var4 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var4 === var1 || var4 === var2 || var4 === var3) var4 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff1}${var1}${var3}+${coeff1}${var2}${var3}-${coeff2}${var1}${var4}-${coeff2}${var2}${var4}`;
+                    const answer = `(${var1}+${var2})(${coeff1}${var3}-${coeff2}${var4})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型6: 平方項併項 (參照例題6: 2b^2-6ab-b+3a)
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 4) + 2; // 2-5
+                    const coeff2 = coeff1 * (Math.floor(Math.random() * 3) + 2); // 2-3倍
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${coeff1}${var1}^2-${coeff2}${var1}${var2}-${var1}+${coeff2/coeff1}${var2}`;
+                    const answer = `(${var1}-${coeff2/coeff1}${var2})(${coeff1}${var1}-1)`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型7: 三次項併項 (參照例題7: r^3-6x^3-3r^2x^2+2rx)
+            {
+                generate: () => {
+                    const coeff1 = Math.floor(Math.random() * 4) + 2; // 2-5
+                    const coeff2 = coeff1 * (Math.floor(Math.random() * 3) + 2); // 2-3倍
+                    const coeff3 = Math.floor(Math.random() * 3) + 2; // 2-4
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'r', 's'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    let var2 = vars[Math.floor(Math.random() * vars.length)];
+                    while (var2 === var1) var2 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${var1}^3-${coeff1}${var2}^3-${coeff2/coeff1}${var1}^2${var2}^2+${coeff3}${var1}${var2}`;
+                    const answer = `(${var1}-${coeff2/coeff1}${var2}^2)(${var1}^2+${coeff3}${var2})`;
+                    return { problem, answer };
+                }
+            },
+            
+            // 類型8: 提取係數併項 (參照例題8: 4x^3+2x^2+16x+8)
+            {
+                generate: () => {
+                    const gcd = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                    const coeff = Math.floor(Math.random() * 3) + 2; // 2-4
+                    const vars = ['a', 'b', 'x', 'y', 'p', 'q', 'm', 'n'];
+                    const var1 = vars[Math.floor(Math.random() * vars.length)];
+                    
+                    const problem = `${gcd*coeff}${var1}^3+${gcd}${var1}^2+${gcd*coeff*4}${var1}+${gcd*4}`;
+                    const answer = `${gcd}(${coeff}${var1}+1)(${var1}^2+4)`;
+                    return { problem, answer };
+                }
+            }
+        ];
+
+        // 動態生成測驗題目
+        function generateTestQuestions(type) {
+            const generators = type === 'factoring' ? factoringGenerators : groupingGenerators;
+            const totalQuestions = generators.length; // 每種題型生成一題
+            
+            const selectedQuestions = [];
+            const selectedAnswers = [];
+            
+            // 為每種題型生成一題
+            for (let i = 0; i < generators.length; i++) {
+                const generated = generators[i].generate();
+                selectedQuestions.push(generated.problem);
+                selectedAnswers.push(generated.answer);
+            }
+            
+            return { questions: selectedQuestions, answers: selectedAnswers };
+        }
+
+        // 開始測驗
+        function startTest(type) {
+            currentTestType = type;
+            currentTestIndex = 0;
+            userAnswers = [];
+            
+            const { questions, answers } = generateTestQuestions(type);
+            testQuestions = questions;
+            correctAnswers = answers;
+            
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('test-area').classList.add('active');
+            
+            updateTestQuestion();
+        }
+
+        // 更新測驗題目
+        function updateTestQuestion() {
+            const totalQuestions = testQuestions.length;
+            
+            document.getElementById('test-counter').textContent = 
+                `第 ${currentTestIndex + 1} 題，共 ${totalQuestions} 題`;
+            
+            document.getElementById('test-question').innerHTML = `$$${testQuestions[currentTestIndex]}$$`;
+            document.getElementById('answer-input').value = '';
+            
+            // 重置答案預覽
+            updateAnswerPreview();
+            
+            // 重新渲染MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 添加到答案輸入框
+        function addToAnswer(char) {
+            const input = document.getElementById('answer-input');
+            input.value += char;
+            updateAnswerPreview();
+        }
+
+        // 清除答案
+        function clearAnswer() {
+            document.getElementById('answer-input').value = '';
+            updateAnswerPreview();
+        }
+
+        // 更新答案預覽
+        function updateAnswerPreview() {
+            const input = document.getElementById('answer-input');
+            const preview = document.getElementById('answer-preview');
+            
+            if (input.value.trim() === '') {
+                preview.innerHTML = '點擊下方按鍵輸入';
+                preview.classList.add('empty');
+            } else {
+                preview.innerHTML = `$$${input.value}$$`;
+                preview.classList.remove('empty');
+                
+                // 重新渲染MathJax
+                if (window.MathJax) {
+                    MathJax.typesetPromise([preview]);
+                }
+            }
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            const answer = document.getElementById('answer-input').value.trim();
+            if (!answer) {
+                return; // 防止空答案提交
+            }
+            
+            userAnswers.push(answer);
+            
+            if (currentTestIndex < testQuestions.length - 1) {
+                currentTestIndex++;
+                updateTestQuestion();
+            } else {
+                // 測驗完成，顯示學生資料輸入
+                document.getElementById('test-area').classList.remove('active');
+                document.getElementById('student-info-area').classList.add('active');
+            }
+        }
+
+        // 保存結果
+        async function saveResults() {
+            const studentClass = document.getElementById('student-class').value;
+            const studentNumber = parseInt(document.getElementById('student-number').value);
+            
+            if (!studentClass || !studentNumber || studentNumber < 1 || studentNumber > 40) {
+                alert('請正確填寫班別和學號');
+                return;
+            }
+            
+            // 計算分數
+            let score = 0;
+            for (let i = 0; i < userAnswers.length; i++) {
+                if (userAnswers[i].toLowerCase().replace(/\s/g, '') === 
+                    correctAnswers[i].toLowerCase().replace(/\s/g, '')) {
+                    score++;
+                }
+            }
+            
+            // 保存到數據庫
+            if (window.dataSdk) {
+                const result = await window.dataSdk.create({
+                    student_class: studentClass,
+                    student_number: studentNumber,
+                    test_type: currentTestType === 'factoring' ? '提取公因式' : '併項法',
+                    score: score,
+                    total_questions: testQuestions.length,
+                    answers: JSON.stringify(userAnswers),
+                    correct_answers: JSON.stringify(correctAnswers),
+                    timestamp: new Date().toISOString()
+                });
+                
+                if (result.isOk) {
+                    showResults(score);
+                } else {
+                    alert('保存成績時發生錯誤，請重試');
+                }
+            }
+        }
+
+        // 顯示結果
+        function showResults(score) {
+            document.getElementById('student-info-area').classList.remove('active');
+            document.getElementById('results-area').classList.add('active');
+            
+            const percentage = Math.round((score / testQuestions.length) * 100);
+            
+            let color = 'var(--text-main)';
+            if (percentage >= 80) color = 'var(--success-color)';
+            else if (percentage < 60) color = 'var(--danger-color)';
+
+            document.getElementById('score-summary').innerHTML = 
+                `<h4 style="margin:0; font-size:1.5rem; color:${color}">成績：${score}/${testQuestions.length} (${percentage}%)</h4>`;
+            
+            let detailedHtml = '';
+            for (let i = 0; i < testQuestions.length; i++) {
+                const isCorrect = userAnswers[i].toLowerCase().replace(/\s/g, '') === 
+                                correctAnswers[i].toLowerCase().replace(/\s/g, '');
+                const resultClass = isCorrect ? 'correct' : 'incorrect';
+                
+                detailedHtml += `
+                    <div class="result-item ${resultClass}">
+                        <div style="margin-bottom:5px;"><strong>第 ${i + 1} 題：</strong> $$${testQuestions[i]}$$</div>
+                        <div style="margin-bottom:5px;"><strong>您的答案：</strong> $$${userAnswers[i]}$$</div>
+                        <div style="margin-bottom:5px;"><strong>正確答案：</strong> $$${correctAnswers[i]}$$</div>
+                        <div style="margin-top:10px; font-weight:bold; color: ${isCorrect ? 'var(--success-color)' : 'var(--danger-color)'}">
+                            ${isCorrect ? '✓ 正確' : '✗ 錯誤'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('detailed-results').innerHTML = detailedHtml;
+            
+            // 重新渲染MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 返回主選單
+        function showMainMenu() {
+            // 隱藏所有內容區域
+            document.getElementById('examples-area').classList.remove('active');
+            document.getElementById('test-area').classList.remove('active');
+            document.getElementById('student-info-area').classList.remove('active');
+            document.getElementById('results-area').classList.remove('active');
+            
+            // 顯示主選單
+            document.getElementById('main-menu').style.display = 'grid';
+        }
+
+        // Elements SDK 配置
+        const defaultConfig = {
+            app_title: "因式分解學習系統",
+            welcome_text: "歡迎使用互動式數學學習平台"
+        };
+
+        async function render(config) {
+            document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+            document.getElementById('welcome-text').textContent = config.welcome_text || defaultConfig.welcome_text;
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["app_title", config.app_title || defaultConfig.app_title],
+                ["welcome_text", config.welcome_text || defaultConfig.welcome_text]
+            ]);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            generateClassOptions();
+            initializeDataSdk();
+            
+            if (window.elementSdk) {
+                window.elementSdk.init({
+                    defaultConfig,
+                    render,
+                    mapToCapabilities,
+                    mapToEditPanelValues
+                });
+            }
+        });
+    </script>
+ </body>
+</html>
