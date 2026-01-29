@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>陳老師的數學實驗室 | Math Lab</title>
+    <title>李廣才老師的數學資源網 | Math Lab</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
@@ -134,7 +134,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fa-solid fa-square-root-variable me-2"></i>陳老師的數學實驗室
+                <i class="fa-solid fa-square-root-variable me-2"></i>李廣才老師_數學資源網
             </a>
             <div class="d-flex align-items-center">
                 <button id="authBtn" class="btn btn-outline-light btn-sm" onclick="toggleAuth()">
@@ -148,7 +148,7 @@
         
         <div class="row mb-4 align-items-center">
             <div class="col-md-8">
-                <h4 id="welcomeMsg" class="mb-1">歡迎來到數學資源庫 👋</h4>
+                <h4 id="welcomeMsg" class="mb-1">歡迎來到數學資源網 👋</h4>
                 <p class="text-muted small">選擇下方的篩選條件找到適合的工具</p>
             </div>
             <div class="col-md-4">
@@ -169,12 +169,14 @@
 
                     <div id="studentFilters">
                         <div class="filter-group-title">年級</div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S1" onchange="renderTools()"> <label class="form-check-label">中一 (S1)</label></div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S2" onchange="renderTools()"> <label class="form-check-label">中二 (S2)</label></div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S3" onchange="renderTools()"> <label class="form-check-label">中三 (S3)</label></div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S4" onchange="renderTools()"> <label class="form-check-label">中四 (S4)</label></div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S5" onchange="renderTools()"> <label class="form-check-label">中五 (S5)</label></div>
-                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S6" onchange="renderTools()"> <label class="form-check-label">中六 (S6)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S1" onchange="renderTools()"> <label class="form-check-label">中一級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S2" onchange="renderTools()"> <label class="form-check-label">中二級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S3" onchange="renderTools()"> <label class="form-check-label">中三級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S4" onchange="renderTools()"> <label class="form-check-label">中四級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S5" onchange="renderTools()"> <label class="form-check-label">中五級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S6" onchange="renderTools()"> <label class="form-check-label">中六級</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="不限年級" onchange="renderTools()"> <label class="form-check-label">不限</label></div>
+                        
 
                         <div class="filter-group-title">課題</div>
                         <select id="topicFilter" class="form-select form-select-sm" onchange="renderTools()">
@@ -183,7 +185,7 @@
                             <option value="幾何">幾何 (Geometry)</option>
                             <option value="統計">統計 (Statistics)</option>
                             <option value="概率">概率 (Probability)</option>
-                            <option value="微積分">微積分 (Calculus)</option>
+                            <option value="其他內容">其他內容 (others)</option>
                         </select>
 
                         <div class="filter-group-title">特殊標籤</div>
@@ -216,58 +218,64 @@
         // ---------------------------------------------------------
         const toolsData = [
             // --- 學生及通用工具 ---
-            {
-                id: 1,
-                title: "二次方程計算機",
-                desc: "輸入係數 a, b, c 自動顯示判別式與根的詳細步驟。",
-                audience: ["student", "teacher"],
-                grades: ["S3", "S4"],
-                topic: "代數",
-                isDSE: true,
-                updateDate: "2024-01-15",
-                url: "./tools/quadratic/index.html"
-            },
-            {
-                id: 2,
-                title: "圓形幾何性質演示",
-                desc: "拖動圓上的點，觀察圓心角與圓周角的關係。",
-                audience: ["student", "teacher"],
-                grades: ["S4"],
-                topic: "幾何",
-                isDSE: true,
-                updateDate: "2024-02-10",
-                url: "./tools/circle-geo/index.html"
-            },
-            {
-                id: 3,
-                title: "初中整數加減練習",
-                desc: "無限生成有向數運算題目，適合初學者。",
-                audience: ["student"],
-                grades: ["S1"],
-                topic: "代數",
-                isDSE: false,
-                updateDate: "2023-11-05",
-                url: "./tools/integers/index.html"
-            },
+                    {
+                        id: 1,  // 隨便給個編號
+                        title: "指數定律_文憑考試題型",  // 工具名稱
+                        desc: "針對HKDSE卷一指數定律題型的測驗。", // 簡介
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S3", "S4", "S5", "S6"],        // 年級
+                        topic: "代數",         // 課題
+                        isDSE: true,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/指數定律_文憑考試題型/index.html" // 對應的路徑 (重要！)
+                }, 
+                    {
+                        id: 2,  // 隨便給個編號
+                        title: "因式分解_文憑考試題型",  // 工具名稱
+                        desc: "針對HKDSE卷一因式分解題型的測驗。", // 簡介
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S3", "S4", "S5", "S6"],        // 年級
+                        topic: "代數",         // 課題
+                        isDSE: true,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/因式分解_文憑考試題型/index.html" // 對應的路徑 (重要！)
+                },
+                    {
+                        id: 3,  // 隨便給個編號
+                        title: "反應力測試_平均數及中位數計算",  // 工具名稱
+                        desc: "記錄反應燈活動中的反應時間，並計算出反應時間的平均數及中位數。", // 簡介
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S3"],        // 年級
+                        topic: "統計",         // 課題
+                        isDSE: false,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/反應力測試_平均數及中位數計算/index.html" // 對應的路徑 (重要！)
+                },
+                    {
+                        id: 4,  // 隨便給個編號
+                        title: "百分法_盈虧及折扣問題",  // 工具名稱
+                        desc: "針對中一級百分法當中盈虧及折扣的測驗(分為三個難度)", // 簡介
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S1"],        // 年級
+                        topic: "代數",         // 課題
+                        isDSE: false,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/百分法（一）_盈虧及折扣問題/index.html" // 對應的路徑 (重要！)
+                },
+                    {
+                        id: 5,  // 隨便給個編號
+                        title: "路徑連接解謎挑戰",  // 工具名稱
+                        desc: "解謎挑戰 - 路徑連接", // 簡介
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["不限年級"],        // 年級
+                        topic: "代數",         // 課題
+                        isDSE: false,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/路徑連接解謎挑戰/index.html" // 對應的路徑 (重要！)
+                },                
+                    // 如果有第二個工具，就在這裡加逗號，然後複製上面的 { ... } 再貼上一份
             // --- 教師專用工具 ---
-            {
-                id: 101,
-                title: "班級成績分佈分析器",
-                desc: "輸入全班分數，自動計算 SD 及繪製 Boxplot。",
-                audience: ["teacher"],
-                category: "analysis", // 對應 filter-type
-                updateDate: "2024-03-01",
-                url: "./tools/grade-analysis/index.html"
-            },
-            {
-                id: 102,
-                title: "工作紙 LaTeX 生成器",
-                desc: "快速將題目轉為 LaTeX 格式並輸出 PDF。",
-                audience: ["teacher"],
-                category: "generator",
-                updateDate: "2024-02-20",
-                url: "./tools/worksheet-gen/index.html"
-            }
+
         ];
 
         // ---------------------------------------------------------
