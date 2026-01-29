@@ -212,9 +212,31 @@
         </div>
     </div>
 
-    <script>
+  <script type="module">
         // ---------------------------------------------------------
-        // 1. 資料庫 (您可以隨時新增工具於此)
+        // 1. Firebase 設定與初始化
+        // ---------------------------------------------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // ★★★ 請將下方的大括號內容替換成您在 Firebase Console 複製的 Config ★★★
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+        apiKey: "AIzaSyBQT3fBOOFKoq13fDBVSWoi_fH9RNhXCiw",
+        authDomain: "math-lab-1f07c.firebaseapp.com",
+        projectId: "math-lab-1f07c",
+        storageBucket: "math-lab-1f07c.firebasestorage.app",
+        messagingSenderId: "52377934810",
+        appId: "1:52377934810:web:22aad87d2d72d1040abee3",
+        measurementId: "G-Y6ZLD904E1"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // ---------------------------------------------------------
+        // 2. 資料庫 (已包含 PDF/Video 格式支援)
         // ---------------------------------------------------------
         const toolsData = [
             // --- 學生及通用工具 ---
@@ -222,6 +244,7 @@
                         id: 1,  // 隨便給個編號
                         title: "指數定律_文憑試卷一題型",  // 工具名稱
                         desc: "針對HKDSE卷一指數定律題型的測驗。", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["S3", "S4", "S5", "S6"],        // 年級
                         topic: "代數",         // 課題
@@ -233,6 +256,7 @@
                         id: 2,  // 隨便給個編號
                         title: "因式分解_文憑試卷一題型",  // 工具名稱
                         desc: "針對HKDSE卷一因式分解題型的測驗。", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["S3", "S4", "S5", "S6"],        // 年級
                         topic: "代數",         // 課題
@@ -244,6 +268,7 @@
                         id: 3,  // 隨便給個編號
                         title: "主項變換_文憑試卷一題型",  // 工具名稱
                         desc: "針對HKDSE卷一主項變換題型的測驗。", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["S2","S3", "S4", "S5", "S6"],        // 年級
                         topic: "代數",         // 課題
@@ -255,6 +280,7 @@
                         id: 4,  // 隨便給個編號
                         title: "反應力測試_平均數及中位數計算",  // 工具名稱
                         desc: "記錄反應燈活動中的反應時間，並計算出反應時間的平均數及中位數。", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["S3"],        // 年級
                         topic: "統計",         // 課題
@@ -266,6 +292,7 @@
                         id: 5,  // 隨便給個編號
                         title: "百分法_盈虧及折扣問題",  // 工具名稱
                         desc: "針對中一級百分法當中盈虧及折扣的測驗(分為三個難度)", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["S1"],        // 年級
                         topic: "代數",         // 課題
@@ -277,54 +304,68 @@
                         id: 6,  // 隨便給個編號
                         title: "路徑連接解謎挑戰",  // 工具名稱
                         desc: "解謎挑戰 - 路徑連接", // 簡介
+                        format: "html",
                         audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
                         grades: ["不限年級"],        // 年級
                         topic: "代數",         // 課題
                         isDSE: false,          // 是否 DSE 適用
                         updateDate: "2026-01-29", // 日期
                         url: "./tools/路徑連接解謎挑戰/index.html" // 對應的路徑 (重要！)
-                },                
-                    // 如果有第二個工具，就在這裡加逗號，然後複製上面的 { ... } 再貼上一份
-            // --- 教師專用工具 ---
-
+                },    
+                    {
+                        id: 7,  // 隨便給個編號
+                        title: "坐標簡介_點的變換",  // 工具名稱
+                        desc: "利用動畫顯示直角坐標平面上的點的變換，包括平移, 反射及旋轉。", // 簡介
+                        format: "html",
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S1"],        // 年級
+                        topic: "幾何",         // 課題
+                        isDSE: false,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/直角坐標平面上的點的變換_坐標簡介/index.html" // 對應的路徑 (重要！)
+                },   
+                    {
+                        id: 8,  // 隨便給個編號
+                        title: "因式分解_提取公因式及拼項法",  // 工具名稱
+                        desc: "針對中二級因式分解當中提取公因式及拼項法的測驗。", // 簡介
+                        format: "html",
+                        audience: ["student", "teacher"], // 目標用戶: "student", "teacher", 或兩者都有
+                        grades: ["S2"],        // 年級
+                        topic: "代數",         // 課題
+                        isDSE: false,          // 是否 DSE 適用
+                        updateDate: "2026-01-29", // 日期
+                        url: "./tools/因式分解_提取公因式及併項法/index.html" // 對應的路徑 (重要！)
+                },  
         ];
 
         // ---------------------------------------------------------
-        // 2. 狀態管理
+        // 3. 全域變數 (用來記錄當前是否為教師)
         // ---------------------------------------------------------
-        let isTeacherMode = false; // 預設為學生模式
+        window.currentIsTeacher = false; 
 
         // ---------------------------------------------------------
-        // 3. 核心功能：渲染工具卡片
+        // 4. 核心功能：渲染工具卡片
         // ---------------------------------------------------------
-        function renderTools() {
+        window.renderTools = function() {
             const container = document.getElementById('toolsContainer');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            
-            // 取得勾選的年級
             const checkedGrades = Array.from(document.querySelectorAll('.filter-grade:checked')).map(cb => cb.value);
-            // 取得選中的課題
             const selectedTopic = document.getElementById('topicFilter').value;
-            // 取得 DSE 開關
             const isDSEOnly = document.getElementById('dseFilter').checked;
-            // 取得勾選的教師類別
             const checkedTypes = Array.from(document.querySelectorAll('.filter-type:checked')).map(cb => cb.value);
 
-            container.innerHTML = ''; // 清空列表
+            container.innerHTML = '';
 
-            // 過濾邏輯
             const filtered = toolsData.filter(tool => {
-                // A. 搜尋關鍵字過濾
+                // A. 搜尋過濾
                 if (!tool.title.toLowerCase().includes(searchVal) && !tool.desc.toLowerCase().includes(searchVal)) return false;
 
-                // B. 權限過濾 (重點)
-                // 如果是學生模式，隱藏只有 "teacher" 的工具
-                if (!isTeacherMode && tool.audience.length === 1 && tool.audience[0] === 'teacher') return false;
+                // B. 權限過濾 (根據 Firebase 狀態)
+                if (!window.currentIsTeacher && tool.audience.length === 1 && tool.audience[0] === 'teacher') return false;
 
-                // C. 標籤過濾 (僅對學生工具生效，除非是教師模式下查看學生工具)
+                // C. 學生模式標籤過濾
                 if (tool.audience.includes('student')) {
                     if (checkedGrades.length > 0) {
-                        // 檢查該工具的適用年級是否有任何一個在勾選名單中
                         const hasMatch = tool.grades.some(g => checkedGrades.includes(g));
                         if (!hasMatch) return false;
                     }
@@ -332,57 +373,62 @@
                     if (isDSEOnly && !tool.isDSE) return false;
                 }
 
-                // D. 教師類別過濾 (僅在教師模式下生效)
-                if (isTeacherMode && tool.audience.includes('teacher') && !tool.audience.includes('student')) {
+                // D. 教師模式類別過濾
+                if (window.currentIsTeacher && tool.audience.includes('teacher') && !tool.audience.includes('student')) {
                      if (checkedTypes.length > 0 && !checkedTypes.includes(tool.category)) return false;
                 }
 
                 return true;
             });
 
-            // 生成 HTML
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="col-12 text-center text-muted py-5">找不到符合條件的工具 <i class="fa-regular fa-face-frown"></i></div>`;
                 return;
             }
 
             filtered.forEach(tool => {
-                // 判斷是否為教師專用
                 const isTeacherTool = tool.audience.length === 1 && tool.audience[0] === 'teacher';
                 
-                // 標籤顯示邏輯
+                // 格式判斷 (Icon 與按鈕)
+                let iconHtml = '<i class="fa-solid fa-cube text-primary me-2"></i>';
+                let btnText = '開啟工具';
+                let btnClass = isTeacherTool ? 'btn-danger' : 'btn-primary';
+                let targetAttr = '';
+
+                if (tool.format === 'pdf') {
+                    iconHtml = '<i class="fa-solid fa-file-pdf text-danger me-2"></i>';
+                    btnText = '下載 / 預覽';
+                    btnClass = 'btn-outline-danger';
+                    targetAttr = 'target="_blank"';
+                } else if (tool.format === 'video') {
+                    iconHtml = '<i class="fa-brands fa-youtube text-danger me-2"></i>';
+                    btnText = '觀看影片';
+                    btnClass = 'btn-outline-dark';
+                    targetAttr = 'target="_blank"';
+                }
+
+                // 標籤 HTML
                 let tagsHtml = '';
-                if (tool.grades) {
-                    tool.grades.forEach(g => tagsHtml += `<span class="badge badge-grade me-1">${g}</span>`);
-                }
-                if (tool.topic) {
-                    tagsHtml += `<span class="badge badge-topic me-1">${tool.topic}</span>`;
-                }
+                if (tool.grades) tool.grades.forEach(g => tagsHtml += `<span class="badge badge-grade me-1">${g}</span>`);
+                if (tool.topic) tagsHtml += `<span class="badge badge-topic me-1">${tool.topic}</span>`;
                 if (isTeacherTool) {
                     tagsHtml += `<span class="badge bg-danger me-1"><i class="fa-solid fa-lock me-1"></i>教師專用</span>`;
                     tagsHtml += `<span class="badge bg-secondary me-1">${tool.category || '一般'}</span>`;
                 }
 
-                // DSE 標籤 HTML
-                const dseBadge = tool.isDSE ? 
-                    `<div class="dse-ribbon"><i class="fa-solid fa-star dse-icon"></i>DSE 適用</div>` : '';
+                const dseBadge = tool.isDSE ? `<div class="dse-ribbon"><i class="fa-solid fa-star dse-icon"></i>DSE</div>` : '';
 
-                // 卡片 HTML
                 const cardHtml = `
                     <div class="col">
                         <div class="card tool-card h-100">
                             ${dseBadge}
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${tool.title}</h5>
-                                <div class="mb-2">
-                                    ${tagsHtml}
-                                </div>
+                                <h5 class="card-title">${iconHtml}${tool.title}</h5>
+                                <div class="mb-2">${tagsHtml}</div>
                                 <p class="card-text text-secondary flex-grow-1 small">${tool.desc}</p>
                                 <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
                                     <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i>${tool.updateDate}</small>
-                                    <a href="${tool.url}" class="btn btn-sm btn-${isTeacherTool ? 'danger' : 'primary'}">
-                                        開啟工具 <i class="fa-solid fa-arrow-right ms-1"></i>
-                                    </a>
+                                    <a href="${tool.url}" class="btn btn-sm ${btnClass}" ${targetAttr}>${btnText} <i class="fa-solid fa-arrow-right ms-1"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -390,53 +436,88 @@
                 `;
                 container.innerHTML += cardHtml;
             });
-        }
+        };
 
         // ---------------------------------------------------------
-        // 4. 模擬登入系統 (未來這裡連接 Firebase)
+        // 5. 監聽 Firebase 登入狀態改變 (自動觸發)
         // ---------------------------------------------------------
-        function toggleAuth() {
-            // 切換狀態
-            isTeacherMode = !isTeacherMode;
-            
+        onAuthStateChanged(auth, (user) => {
             const btn = document.getElementById('authBtn');
-            const authText = document.getElementById('authText');
             const welcomeMsg = document.getElementById('welcomeMsg');
             const teacherFilters = document.getElementById('teacherFilters');
             const studentFilters = document.getElementById('studentFilters');
 
-            if (isTeacherMode) {
-                // 登入後狀態
+            if (user) {
+                // --- 已登入 ---
+                console.log("Teacher logged in:", user.email);
+                window.currentIsTeacher = true;
+                
+                // UI 變更
                 btn.classList.replace('btn-outline-light', 'btn-warning');
-                btn.innerHTML = `<i class="fa-solid fa-right-from-bracket me-1"></i> 登出`;
-                welcomeMsg.innerHTML = `歡迎回來 <span class="badge bg-warning text-dark">教師模式</span>`;
+                btn.innerHTML = `<i class="fa-solid fa-right-from-bracket me-1"></i> 登出 (${user.email.split('@')[0]})`;
+                welcomeMsg.innerHTML = `歡迎回來，${user.email.split('@')[0]} 老師 <span class="badge bg-warning text-dark">教師模式</span>`;
                 teacherFilters.style.display = 'block';
-                // studentFilters.style.opacity = '0.5'; // 讓學生篩選變淡，或保持原樣
             } else {
-                // 登出後狀態
+                // --- 未登入 ---
+                console.log("No user logged in");
+                window.currentIsTeacher = false;
+
+                // UI 變更
                 btn.classList.replace('btn-warning', 'btn-outline-light');
                 btn.innerHTML = `<i class="fa-solid fa-user-tie me-1"></i> 教師登入`;
                 welcomeMsg.innerHTML = `歡迎來到數學資源庫 👋`;
                 teacherFilters.style.display = 'none';
-                studentFilters.style.opacity = '1';
             }
-
-            // 重新渲染列表
+            // 每次狀態改變，都重新渲染工具列表
             renderTools();
-        }
+        });
 
-        function resetFilters() {
+        // ---------------------------------------------------------
+        // 6. 登入/登出按鈕邏輯
+        // ---------------------------------------------------------
+        window.toggleAuth = async function() {
+            if (window.currentIsTeacher) {
+                // 如果已登入，則執行登出
+                try {
+                    await signOut(auth);
+                    alert("已成功登出");
+                } catch (error) {
+                    console.error(error);
+                    alert("登出失敗：" + error.message);
+                }
+            } else {
+                // 如果未登入，跳出視窗詢問帳號密碼
+                const email = prompt("請輸入教師 Email:");
+                if (!email) return;
+                const password = prompt("請輸入密碼:");
+                if (!password) return;
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // 登入成功後，onAuthStateChanged 會自動處理 UI，不需要在這裡寫
+                    alert("登入成功！");
+                } catch (error) {
+                    console.error(error);
+                    // 錯誤代碼轉中文提示 (簡易版)
+                    let msg = "登入失敗，請檢查帳號密碼。";
+                    if(error.code === 'auth/invalid-credential') msg = "帳號或密碼錯誤。";
+                    alert(msg);
+                }
+            }
+        }
+        
+        // ---------------------------------------------------------
+        // 7. 其他輔助功能 (重置篩選)
+        // ---------------------------------------------------------
+        window.resetFilters = function() {
             document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
             document.getElementById('searchInput').value = '';
             document.getElementById('topicFilter').value = '';
             renderTools();
         }
 
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTools();
-        });
-
+        // 初次執行
+        // 注意：onAuthStateChanged 會在頁面載入後自動執行一次，所以不需要手動呼叫 renderTools()
     </script>
 </body>
 </html>
