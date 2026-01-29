@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數學恆等式學習平台</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+  <style>
+        /* 核心樣式設定 */
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* 標題區域 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5, #2196f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #b0bec5;
+            margin: 0;
+        }
+
+        /* 主選單 */
+        .main-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .menu-button {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 25px 40px;
+            font-size: 1.3rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+            min-width: 280px;
+            font-weight: bold;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(33, 150, 243, 0.5);
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+        }
+
+        /* 內容區域通用樣式 */
+        .content-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 例題模式樣式 */
+        .example-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .example-content {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #2196f3;
+        }
+
+        .problem { font-size: 1.5rem; margin-bottom: 20px; color: #e3f2fd; }
+        .solution { font-size: 1.2rem; line-height: 1.8; color: #b3e5fc; }
+
+        /* 測驗模式樣式 */
+        .quiz-progress {
+            background: rgba(255, 255, 255, 0.1);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .quiz-progress-bar {
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            height: 100%;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 30px 0;
+            color: #fff;
+        }
+
+        .answer-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1px;
+        }
+
+        /* 鍵盤樣式 */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .keypad-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .keypad-button:hover { background: rgba(255, 255, 255, 0.2); }
+        .keypad-button:active { transform: scale(0.95); }
+        .keypad-button.operator { background: rgba(33, 150, 243, 0.3); border-color: rgba(33, 150, 243, 0.5); }
+        .keypad-button.clear { background: rgba(244, 67, 54, 0.3); border-color: rgba(244, 67, 54, 0.5); }
+        
+        .variable-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .nav-button, .back-button, .submit-button {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .nav-button { background: #607d8b; }
+        .submit-button { background: linear-gradient(135deg, #4caf50, #2e7d32); width: 200px; font-weight: bold; }
+        .back-button { background: #546e7a; }
+        
+        .nav-button:hover, .back-button:hover, .submit-button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .nav-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .feedback-area {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-correct {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            color: #4caf50;
+        }
+
+        .feedback-wrong {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #ffcdd2;
+        }
+
+        .feedback-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+        .feedback-detail { font-size: 1.2rem; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .result-score {
+            font-size: 3rem;
+            text-align: center;
+            color: #64b5f6;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.4);
+        }
+
+        .review-list { margin-top: 30px; }
+        .review-item {
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #ccc;
+        }
+        .review-item.correct { border-left-color: #4caf50; }
+        .review-item.wrong { border-left-color: #f44336; }
+
+        @media (max-width: 600px) {
+            .main-title { font-size: 1.5rem; }
+            .menu-button { width: 100%; min-width: auto; }
+            .keypad { gap: 5px; }
+            .keypad-button { padding: 12px; font-size: 1rem; }
+            .action-buttons { flex-direction: column; }
+            .submit-button, .back-button { width: 100%; }
+        }
+    </style>
+ </head>
+ <body>
+
+  <div class="container">
+   <header class="header">
+    <h1 class="main-title">數學恆等式學習平台</h1>
+    <p class="subtitle">中二級 - 平方差與完全平方恆等式</p>
+   </header>
+
+   <div id="mainMenu" class="content-area active" style="text-align: center;">
+    <h2 style="color: #fff; margin-bottom: 30px;">請選擇學習模式</h2>
+    <div class="main-menu">
+        <button class="menu-button" onclick="startSection('difference')">
+            平方差恆等式<br>
+            <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">$(a+b)(a-b) = a^2-b^2$</span>
+        </button> 
+        <button class="menu-button" onclick="startSection('perfectSquare')" style="background: linear-gradient(135deg, #ff9800, #f57c00);">
+            完全平方恆等式<br>
+            <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">$(a\pm b)^2 = a^2 \pm 2ab + b^2$</span>
+        </button>
+    </div>
+   </div>
+
+   <div id="exampleArea" class="content-area">
+    <div class="example-header">
+     <h2 id="exampleTitle" style="margin:0; color:#64b5f6;">例題學習</h2>
+     <div style="background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px;">
+        例題 <span id="currentExampleNum">1</span> / <span id="totalExampleNum">10</span>
+     </div>
+    </div>
+
+    <div class="example-content">
+     <div class="problem" id="exampleProblem">題目載入中...</div>
+     <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.2); margin: 20px 0;">
+     <div class="solution" id="exampleSolution">解答載入中...</div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="nav-button" id="prevExBtn" onclick="changeExample(-1)">上一題</button>
+        <button class="submit-button" onclick="switchToQuiz()">進入測驗</button>
+        <button class="nav-button" id="nextExBtn" onclick="changeExample(1)">下一題</button>
+    </div>
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="back-button" onclick="showMainMenu()">返回主選單</button>
+    </div>
+   </div>
+
+   <div id="quizArea" class="content-area">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="quizTitle" style="margin:0; color:#ff9800;">測驗中</h2>
+        <span>題目 <span id="currentQuestionNum">1</span> / 10</span>
+    </div>
+
+    <div class="quiz-progress">
+       <div class="quiz-progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="question-text" id="quizQuestion">題目載入中...</div>
+
+    <div class="answer-display" id="answerDisplay">
+        點擊下方鍵盤輸入答案
+    </div>
+
+    <div id="feedbackArea" class="feedback-area">
+        <div class="feedback-title" id="feedbackTitle"></div>
+        <div class="feedback-detail" id="feedbackDetail"></div>
+    </div>
+
+    <div id="inputArea">
+        <div class="keypad">
+            <button class="keypad-button" onclick="inputChar('7')">7</button>
+            <button class="keypad-button" onclick="inputChar('8')">8</button>
+            <button class="keypad-button" onclick="inputChar('9')">9</button>
+            <button class="keypad-button operator" onclick="inputChar('+')">+</button>
+            
+            <button class="keypad-button" onclick="inputChar('4')">4</button>
+            <button class="keypad-button" onclick="inputChar('5')">5</button>
+            <button class="keypad-button" onclick="inputChar('6')">6</button>
+            <button class="keypad-button operator" onclick="inputChar('-')">-</button>
+            
+            <button class="keypad-button" onclick="inputChar('1')">1</button>
+            <button class="keypad-button" onclick="inputChar('2')">2</button>
+            <button class="keypad-button" onclick="inputChar('3')">3</button>
+            <button class="keypad-button operator" onclick="inputChar('^2')">$x^2$</button>
+            
+            <button class="keypad-button" onclick="inputChar('0')">0</button>
+            <button class="keypad-button operator" onclick="inputChar('(')">(</button>
+            <button class="keypad-button operator" onclick="inputChar(')')">)</button>
+            <button class="keypad-button clear" onclick="clearInput()">清除</button>
+        </div>
+        <div class="variable-row">
+            <button class="keypad-button operator" onclick="inputChar('a')">$a$</button>
+            <button class="keypad-button operator" onclick="inputChar('b')">$b$</button>
+            <button class="keypad-button operator" onclick="inputChar('c')">$c$</button>
+            <button class="keypad-button operator" onclick="inputChar('d')">$d$</button>
+            <button class="keypad-button operator" onclick="inputChar('h')">$h$</button>
+            <button class="keypad-button operator" onclick="inputChar('k')">$k$</button>
+            <button class="keypad-button operator" onclick="inputChar('m')">$m$</button>
+            <button class="keypad-button operator" onclick="inputChar('n')">$n$</button>
+            <button class="keypad-button operator" onclick="inputChar('x')">$x$</button>
+            <button class="keypad-button operator" onclick="inputChar('y')">$y$</button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button id="quizActionBtn" class="submit-button" onclick="handleQuizAction()">提交答案</button>
+    </div>
+    <div style="text-align: center; margin-top: 15px;">
+        <button class="back-button" onclick="confirmQuitQuiz()">退出測驗</button>
+    </div>
+   </div>
+
+   <div id="resultArea" class="content-area">
+    <h2 style="text-align: center; color: #fff;">測驗完成</h2>
+    
+    <div class="result-score" id="finalScore">
+        80分
+    </div>
+    <p style="text-align: center; font-size: 1.2rem; color: #b0bec5;" id="scoreComment">做得不錯！</p>
+
+    <div class="action-buttons">
+        <button class="submit-button" onclick="restartQuiz()">再試一次</button>
+        <button class="back-button" onclick="showMainMenu()">返回主選單</button>
+    </div>
+
+    <h3 style="margin-top: 40px; color: #64b5f6;">答題檢討</h3>
+    <div class="review-list" id="reviewList">
+        </div>
+   </div>
+
+  </div>
+
+  <script>
+    // --- 資料結構 ---
+    const examplesData = {
+        difference: [
+            { q: "$(a+3)(a-3)$", a: "$(a+3)(a-3) = a^2 - 3^2 = a^2 - 9$" },
+            { q: "$(7+b)(7-b)$", a: "$(7+b)(7-b) = 7^2 - b^2 = 49 - b^2$" },
+            { q: "$(2a+3)(2a-3)$", a: "$(2a+3)(2a-3) = (2a)^2 - 3^2 = 4a^2 - 9$" },
+            { q: "$(4-5c)(4+5c)$", a: "$(4-5c)(4+5c) = 4^2 - (5c)^2 = 16 - 25c^2$" },
+            { q: "$(3x+4y)(3x-4y)$", a: "$(3x+4y)(3x-4y) = (3x)^2 - (4y)^2 = 9x^2 - 16y^2$" },
+            { q: "$(-m+3)(-m-3)$", a: "$(-m+3)(-m-3) = (-m)^2 - 3^2 = m^2 - 9$" },
+            { q: "$(-6x-y)(-6x+y)$", a: "$(-6x-y)(-6x+y) = (-6x)^2 - y^2 = 36x^2 - y^2$" },
+            { q: "$(9b-a)(a+9b)$", a: "重新排列：$(9b-a)(9b+a) = (9b)^2 - a^2 = 81b^2 - a^2$" },
+            { q: "$4(5a+7)(5a-7)$", a: "$4[(5a)^2 - 7^2] = 4(25a^2 - 49) = 100a^2 - 196$" },
+            { q: "$-5(8m+3n)(8m-3n)$", a: "$-5[(8m)^2 - (3n)^2] = -5(64m^2 - 9n^2) = -320m^2 + 45n^2$" }
+        ],
+        perfectSquare: [
+            { q: "$(h+3)^2$", a: "$(h+3)^2 = h^2 + 2(h)(3) + 3^2 = h^2 + 6h + 9$" },
+            { q: "$(k-3)^2$", a: "$(k-3)^2 = k^2 - 2(k)(3) + 3^2 = k^2 - 6k + 9$" },
+            { q: "$(2a+5)^2$", a: "$(2a+5)^2 = (2a)^2 + 2(2a)(5) + 5^2 = 4a^2 + 20a + 25$" },
+            { q: "$(3n-7)^2$", a: "$(3n-7)^2 = (3n)^2 - 2(3n)(7) + 7^2 = 9n^2 - 42n + 49$" },
+            { q: "$(4+5d)^2$", a: "$(4+5d)^2 = 4^2 + 2(4)(5d) + (5d)^2 = 16 + 40d + 25d^2$" },
+            { q: "$(-9-2a)^2$", a: "視為 $-(9+2a)$ 的平方：$(9+2a)^2 = 81 + 36a + 4a^2$" },
+            { q: "$(3a+2b)^2$", a: "$(3a+2b)^2 = (3a)^2 + 2(3a)(2b) + (2b)^2 = 9a^2 + 12ab + 4b^2$" },
+            { q: "$(2x-3y)^2$", a: "$(2x-3y)^2 = (2x)^2 - 2(2x)(3y) + (3y)^2 = 4x^2 - 12xy + 9y^2$" },
+            { q: "$-(7-6b)^2$", a: "$- [7^2 - 2(7)(6b) + (6b)^2] = -(49 - 84b + 36b^2) = -49 + 84b - 36b^2$" },
+            { q: "$3(4m+n)^2$", a: "$3[(4m)^2 + 2(4m)(n) + n^2] = 3(16m^2 + 8mn + n^2) = 48m^2 + 24mn + 3n^2$" }
+        ]
+    };
+
+    // --- 全局變數 ---
+    let currentMode = ''; 
+    let currentExampleIndex = 0;
+    
+    // 測驗變數
+    let quizQuestions = [];
+    let currentQuestionIndex = 0;
+    let userScore = 0;
+    let currentInput = '';
+    let quizState = 'answering'; 
+    let userHistory = []; 
+
+    // --- 核心邏輯：從原版恢復的題目生成器 ---
+    function generateQuizQuestions(type) {
+        const questions = [];
+        const variables = ['a', 'b', 'c', 'd', 'h', 'k', 'm', 'n', 'x', 'y'];
+        
+        if (type === 'difference') {
+            const patterns = [
+                // 1. (v+n)(v-n)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${v}+${n})(${v}-${n})`, a: `${v}^2-${n*n}` };
+                },
+                // 2. (n+v)(n-v)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${n}+${v})(${n}-${v})`, a: `${n*n}-${v}^2` };
+                },
+                // 3. (cv+n)(cv-n)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    let c = Math.floor(Math.random() * 8) + 2;
+                    let n = Math.floor(Math.random() * 9) + 2;
+                    while (c === n) n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${c}${v}+${n})(${c}${v}-${n})`, a: `${c*c}${v}^2-${n*n}` };
+                },
+                // 4. (n-cv)(n+cv)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    let c = Math.floor(Math.random() * 8) + 2;
+                    let n = Math.floor(Math.random() * 9) + 2;
+                    while (c === n) n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${n}-${c}${v})(${n}+${c}${v})`, a: `${n*n}-${c*c}${v}^2` };
+                },
+                // 5. (c1v1+c2v2)(c1v1-c2v2)
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    let c1 = Math.floor(Math.random() * 8) + 2;
+                    let c2 = Math.floor(Math.random() * 8) + 2;
+                    while (c1 === c2) c2 = Math.floor(Math.random() * 8) + 2;
+                    return { q: `(${c1}${v1}+${c2}${v2})(${c1}${v1}-${c2}${v2})`, a: `${c1*c1}${v1}^2-${c2*c2}${v2}^2` };
+                },
+                // 6. (-v+n)(-v-n)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(-${v}+${n})(-${v}-${n})`, a: `${v}^2-${n*n}` };
+                },
+                // 7. (-cv1-v2)(-cv1+v2)
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    return { q: `(-${c}${v1}-${v2})(-${c}${v1}+${v2})`, a: `${c*c}${v1}^2-${v2}^2` };
+                },
+                // 8. (cv1-v2)(v2+cv1)
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    return { q: `(${c}${v1}-${v2})(${v2}+${c}${v1})`, a: `${c*c}${v1}^2-${v2}^2` };
+                },
+                // 9. k(cv+n)(cv-n)
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const coeff = Math.floor(Math.random() * 5) + 2;
+                    let c = Math.floor(Math.random() * 8) + 2;
+                    let n = Math.floor(Math.random() * 9) + 2;
+                    while (c === coeff) c = Math.floor(Math.random() * 8) + 2;
+                    return { q: `${coeff}(${c}${v}+${n})(${c}${v}-${n})`, a: `${coeff*c*c}${v}^2-${coeff*n*n}` };
+                },
+                // 10. -k(c1v1+c2v2)(c1v1-c2v2)
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const coeff = Math.floor(Math.random() * 5) + 2;
+                    let c1 = Math.floor(Math.random() * 8) + 2;
+                    let c2 = Math.floor(Math.random() * 8) + 2;
+                    while (c1 === c2) c2 = Math.floor(Math.random() * 8) + 2;
+                    return { q: `-${coeff}(${c1}${v1}+${c2}${v2})(${c1}${v1}-${c2}${v2})`, a: `-${coeff*c1*c1}${v1}^2+${coeff*c2*c2}${v2}^2` };
+                }
+            ];
+            for (let i = 0; i < 10; i++) questions.push(patterns[i]());
+        } else {
+            const patterns = [
+                // 1. (v+n)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${v}+${n})^2`, a: `${v}^2+${2*n}${v}+${n*n}` };
+                },
+                // 2. (v-n)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${v}-${n})^2`, a: `${v}^2-${2*n}${v}+${n*n}` };
+                },
+                // 3. (cv+n)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${c}${v}+${n})^2`, a: `${c*c}${v}^2+${2*c*n}${v}+${n*n}` };
+                },
+                // 4. (cv-n)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${c}${v}-${n})^2`, a: `${c*c}${v}^2-${2*c*n}${v}+${n*n}` };
+                },
+                // 5. (n+cv)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(${n}+${c}${v})^2`, a: `${n*n}+${2*n*c}${v}+${c*c}${v}^2` };
+                },
+                // 6. (-n-cv)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `(-${n}-${c}${v})^2`, a: `${n*n}+${2*n*c}${v}+${c*c}${v}^2` };
+                },
+                // 7. (c1v1+c2v2)^2
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const c1 = Math.floor(Math.random() * 8) + 2;
+                    const c2 = Math.floor(Math.random() * 8) + 2;
+                    return { q: `(${c1}${v1}+${c2}${v2})^2`, a: `${c1*c1}${v1}^2+${2*c1*c2}${v1}${v2}+${c2*c2}${v2}^2` };
+                },
+                // 8. (c1v1-c2v2)^2
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const c1 = Math.floor(Math.random() * 8) + 2;
+                    const c2 = Math.floor(Math.random() * 8) + 2;
+                    return { q: `(${c1}${v1}-${c2}${v2})^2`, a: `${c1*c1}${v1}^2-${2*c1*c2}${v1}${v2}+${c2*c2}${v2}^2` };
+                },
+                // 9. -(n-cv)^2
+                () => {
+                    const v = variables[Math.floor(Math.random() * variables.length)];
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    const n = Math.floor(Math.random() * 9) + 2;
+                    return { q: `-(${n}-${c}${v})^2`, a: `-${n*n}+${2*n*c}${v}-${c*c}${v}^2` };
+                },
+                // 10. k(c1v1+v2)^2
+                () => {
+                    const v1 = variables[Math.floor(Math.random() * variables.length)];
+                    let v2 = variables[Math.floor(Math.random() * variables.length)];
+                    while (v1 === v2) v2 = variables[Math.floor(Math.random() * variables.length)];
+                    const coeff = Math.floor(Math.random() * 5) + 2;
+                    const c = Math.floor(Math.random() * 8) + 2;
+                    return { q: `${coeff}(${c}${v1}+${v2})^2`, a: `${coeff*c*c}${v1}^2+${coeff*2*c}${v1}${v2}+${coeff}${v2}^2` };
+                }
+            ];
+            for (let i = 0; i < 10; i++) questions.push(patterns[i]());
+        }
+        return questions;
+    }
+
+    // --- 核心邏輯：從原版恢復的答案比對系統 ---
+    function normalizeExpression(expr) {
+        expr = expr.replace(/\s+/g, '').replace(/\+-/g, '-').replace(/--/g, '+');
+        let terms = [];
+        let currentTerm = '';
+        let depth = 0;
+        
+        for (let i = 0; i < expr.length; i++) {
+            const char = expr[i];
+            if (char === '(' || char === '{' || char === '[') depth++;
+            else if (char === ')' || char === '}' || char === ']') depth--;
+            
+            if (depth === 0 && (char === '+' || char === '-') && i > 0 && expr[i-1] !== '^') {
+                if (currentTerm) terms.push(currentTerm);
+                currentTerm = char === '-' ? '-' : '';
+            } else {
+                currentTerm += char;
+            }
+        }
+        if (currentTerm) terms.push(currentTerm);
+        
+        const normalizedTerms = terms.map(term => normalizeTerm(term));
+        normalizedTerms.sort((a, b) => getTermOrder(a).localeCompare(getTermOrder(b)));
+        
+        let result = normalizedTerms[0] || '';
+        for (let i = 1; i < normalizedTerms.length; i++) {
+            result += (normalizedTerms[i].startsWith('-') ? '' : '+') + normalizedTerms[i];
+        }
+        return result;
+    }
+
+    function normalizeTerm(term) {
+        let coefficient = '';
+        let i = 0;
+        if (term.startsWith('-')) { coefficient = '-'; i = 1; }
+        else if (term.startsWith('+')) { i = 1; }
+        
+        while (i < term.length && (term[i].match(/[0-9]/) || term[i] === '.')) {
+            coefficient += term[i];
+            i++;
+        }
+        if (coefficient === '' || coefficient === '-') {
+            if (i < term.length && term[i].match(/[a-zA-Z]/)) coefficient += '1';
+        }
+        
+        let varPart = term.substring(i);
+        let variables = [];
+        let j = 0;
+        while (j < varPart.length) {
+            if (varPart[j].match(/[a-zA-Z]/)) {
+                let variable = varPart[j];
+                let power = 1;
+                j++;
+                if (j < varPart.length && varPart[j] === '^') {
+                    j++;
+                    let powerStr = '';
+                    while (j < varPart.length && varPart[j].match(/[0-9]/)) {
+                        powerStr += varPart[j];
+                        j++;
+                    }
+                    power = parseInt(powerStr) || 1;
+                }
+                variables.push({ var: variable, power: power });
+            } else {
+                j++;
+            }
+        }
+        variables.sort((a, b) => a.var.localeCompare(b.var));
+        
+        let result = coefficient || '1';
+        if (result === '1' && variables.length > 0) result = '';
+        else if (result === '-1' && variables.length > 0) result = '-';
+        
+        variables.forEach(v => {
+            result += v.var + (v.power > 1 ? '^' + v.power : '');
+        });
+        return result || '0';
+    }
+
+    function getTermOrder(term) {
+        let variables = [];
+        let i = 0;
+        while (i < term.length && (term[i].match(/[0-9\-\+\.]/) || term[i] === '-')) i++;
+        while (i < term.length) {
+            if (term[i].match(/[a-zA-Z]/)) {
+                let variable = term[i];
+                let power = 1;
+                i++;
+                if (i < term.length && term[i] === '^') {
+                    i++;
+                    let powerStr = '';
+                    while (i < term.length && term[i].match(/[0-9]/)) {
+                        powerStr += term[i];
+                        i++;
+                    }
+                    power = parseInt(powerStr) || 1;
+                }
+                variables.push({ var: variable, power: power });
+            } else i++;
+        }
+        const totalPower = variables.reduce((sum, v) => sum + v.power, 0);
+        const varString = variables.sort((a, b) => a.var.localeCompare(b.var)).map(v => v.var + v.power).join('');
+        return (1000 - totalPower).toString().padStart(4, '0') + varString;
+    }
+
+    function checkAnswer(user, correct) {
+        if (normalizeExpression(user) === normalizeExpression(correct)) return true;
+        // 額外檢查：交換律等價形式 (針對簡單情況)
+        // 注意：原版的 compareAnswers 更複雜，這裡為了保持 UI 響應速度，
+        // 我們依賴 normalizeExpression 的強大排序功能已經能處理大部分情況 (a+b vs b+a)。
+        return false;
+    }
+
+    // --- 頁面邏輯 ---
+    function showMainMenu() {
+        hideAllSections();
+        document.getElementById('mainMenu').classList.add('active');
+    }
+
+    function hideAllSections() {
+        document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
+    }
+
+    function startSection(mode) {
+        currentMode = mode;
+        currentExampleIndex = 0;
+        
+        hideAllSections();
+        document.getElementById('exampleArea').classList.add('active');
+        document.getElementById('exampleTitle').textContent = 
+            mode === 'difference' ? '平方差恆等式 - 例題' : '完全平方恆等式 - 例題';
+        
+        renderExample();
+    }
+
+    function renderExample() {
+        const list = examplesData[currentMode];
+        const ex = list[currentExampleIndex];
+        
+        document.getElementById('currentExampleNum').textContent = currentExampleIndex + 1;
+        document.getElementById('totalExampleNum').textContent = list.length;
+        
+        const probEl = document.getElementById('exampleProblem');
+        const solEl = document.getElementById('exampleSolution');
+        
+        probEl.innerHTML = `展開 ${ex.q}`;
+        solEl.innerHTML = `步驟：<br>${ex.a}`;
+        
+        document.getElementById('prevExBtn').disabled = currentExampleIndex === 0;
+        document.getElementById('nextExBtn').disabled = currentExampleIndex === list.length - 1;
+
+        if (window.MathJax) MathJax.typesetPromise([probEl, solEl]);
+    }
+
+    function changeExample(delta) {
+        const list = examplesData[currentMode];
+        const newIndex = currentExampleIndex + delta;
+        if (newIndex >= 0 && newIndex < list.length) {
+            currentExampleIndex = newIndex;
+            renderExample();
+        }
+    }
+
+    function switchToQuiz() {
+        // 使用恢復後的原版生成邏輯
+        quizQuestions = generateQuizQuestions(currentMode);
+        currentQuestionIndex = 0;
+        userScore = 0;
+        userHistory = [];
+        
+        hideAllSections();
+        document.getElementById('quizArea').classList.add('active');
+        document.getElementById('quizTitle').textContent = currentMode === 'difference' ? '平方差測驗' : '完全平方測驗';
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = quizQuestions[currentQuestionIndex];
+        
+        quizState = 'answering';
+        currentInput = '';
+        updateInputDisplay('點擊下方鍵盤輸入答案');
+        
+        document.getElementById('feedbackArea').style.display = 'none';
+        document.getElementById('inputArea').style.pointerEvents = 'auto';
+        document.getElementById('inputArea').style.opacity = '1';
+        
+        const actionBtn = document.getElementById('quizActionBtn');
+        actionBtn.textContent = '提交答案';
+        actionBtn.className = 'submit-button';
+        actionBtn.style.background = '';
+
+        document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
+        document.getElementById('progressBar').style.width = `${((currentQuestionIndex)/10)*100}%`;
+        
+        const qEl = document.getElementById('quizQuestion');
+        // 原版題目字符串已經包含 $, 這裡直接加 "展開 "
+        qEl.innerHTML = `展開 $${q.q}$`;
+        if (window.MathJax) MathJax.typesetPromise([qEl]);
+    }
+
+    function inputChar(char) {
+        if (quizState !== 'answering') return;
+        currentInput += char;
+        updateInputDisplay(`$${currentInput}$`);
+    }
+
+    function clearInput() {
+        if (quizState !== 'answering') return;
+        currentInput = '';
+        updateInputDisplay('點擊下方鍵盤輸入答案');
+    }
+
+    function updateInputDisplay(content) {
+        const el = document.getElementById('answerDisplay');
+        el.innerHTML = content;
+        if (content.includes('$') && window.MathJax) {
+            MathJax.typesetPromise([el]);
+        }
+    }
+
+    function handleQuizAction() {
+        if (quizState === 'answering') {
+            submitAnswer();
+        } else {
+            nextQuestion();
+        }
+    }
+
+    function submitAnswer() {
+        if (!currentInput.trim()) return;
+
+        const correctAnswer = quizQuestions[currentQuestionIndex].a;
+        // 使用恢復後的原版檢查邏輯
+        const isCorrect = checkAnswer(currentInput, correctAnswer);
+        
+        userHistory.push({
+            q: quizQuestions[currentQuestionIndex].q,
+            userA: currentInput,
+            correctA: correctAnswer,
+            isCorrect: isCorrect
+        });
+
+        if (isCorrect) userScore++;
+
+        showFeedback(isCorrect, correctAnswer);
+
+        quizState = 'reviewing';
+        const actionBtn = document.getElementById('quizActionBtn');
+        actionBtn.textContent = (currentQuestionIndex < 9) ? '下一題' : '查看結果';
+        actionBtn.style.background = isCorrect ? '#4caf50' : '#607d8b';
+        
+        document.getElementById('inputArea').style.pointerEvents = 'none';
+        document.getElementById('inputArea').style.opacity = '0.5';
+    }
+
+    function showFeedback(isCorrect, correctAnswer) {
+        const fbArea = document.getElementById('feedbackArea');
+        const fbTitle = document.getElementById('feedbackTitle');
+        const fbDetail = document.getElementById('feedbackDetail');
+
+        fbArea.style.display = 'block';
+        fbArea.className = 'feedback-area ' + (isCorrect ? 'feedback-correct' : 'feedback-wrong');
+        
+        if (isCorrect) {
+            fbTitle.innerHTML = '✓ 回答正確！';
+            fbDetail.innerHTML = '';
+        } else {
+            fbTitle.innerHTML = '✗ 回答錯誤';
+            fbDetail.innerHTML = `正確答案是：$${correctAnswer}$`;
+            if (window.MathJax) MathJax.typesetPromise([fbDetail]);
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 10) {
+            loadQuestion();
+        } else {
+            showResultPage();
+        }
+    }
+
+    function confirmQuitQuiz() {
+        if (confirm("確定要退出測驗嗎？目前的進度將會遺失。")) {
+            showMainMenu();
+        }
+    }
+
+    function showResultPage() {
+        hideAllSections();
+        document.getElementById('resultArea').classList.add('active');
+        
+        const finalScore = userScore * 10;
+        document.getElementById('finalScore').textContent = `${finalScore}分`;
+        
+        let comment = '';
+        if (finalScore === 100) comment = "太完美了！你是代數天才！";
+        else if (finalScore >= 80) comment = "非常優秀！掌握得很好。";
+        else if (finalScore >= 60) comment = "及格了，繼續保持！";
+        else comment = "再接再厲，多練習例題會更有幫助喔！";
+        document.getElementById('scoreComment').textContent = comment;
+
+        const listEl = document.getElementById('reviewList');
+        listEl.innerHTML = '';
+        
+        userHistory.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = `review-item ${item.isCorrect ? 'correct' : 'wrong'}`;
+            div.innerHTML = `
+                <div style="margin-bottom:5px;"><strong>第 ${idx+1} 題：</strong> 展開 $${item.q}$</div>
+                <div style="display:flex; flex-wrap:wrap; gap:15px; font-size: 0.95rem;">
+                    <span style="color: ${item.isCorrect ? '#4caf50' : '#f44336'}">你的答案：$${item.userA}$</span>
+                    ${!item.isCorrect ? `<span>正確答案：$${item.correctA}$</span>` : ''}
+                </div>
+            `;
+            listEl.appendChild(div);
+        });
+
+        if (window.MathJax) MathJax.typesetPromise([listEl]);
+    }
+
+    function restartQuiz() {
+        switchToQuiz();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showMainMenu();
+    });
+
+  </script>
+ </body>
+</html>

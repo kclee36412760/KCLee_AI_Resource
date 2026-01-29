@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反應力測試</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+      import { getDatabase, ref, push, onValue, query, orderByChild, limitToFirst } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyDGuKqva8tVzjVgPnPgVjPmX064okR7NRI",
+        authDomain: "project1-998f6.firebaseapp.com",
+        databaseURL: "https://project1-998f6-default-rtdb.firebaseio.com",
+        projectId: "project1-998f6",
+        storageBucket: "project1-998f6.firebasestorage.app",
+        messagingSenderId: "31375712023",
+        appId: "1:31375712023:web:7cd9afe8ce1ab753aa6152",
+        measurementId: "G-6KJMNCDZ3C"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally
+      window.firebaseApp = app;
+      window.firebaseDatabase = database;
+      window.firebaseRef = ref;
+      window.firebasePush = push;
+      window.firebaseOnValue = onValue;
+      window.firebaseQuery = query;
+      window.firebaseOrderByChild = orderByChild;
+      window.firebaseLimitToFirst = limitToFirst;
+    </script>
+  <style>
+        .bulb {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 4px solid #374151;
+        }
+        .bulb-off {
+            background: linear-gradient(145deg, #6b7280, #4b5563);
+            box-shadow: inset 5px 5px 10px #374151, inset -5px -5px 10px #9ca3af;
+        }
+        .bulb-on {
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            box-shadow: 0 0 30px #fbbf24, inset 2px 2px 5px #f59e0b, inset -2px -2px 5px #fcd34d;
+            border-color: #f59e0b;
+        }
+        .countdown {
+            font-size: 8rem;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen flex flex-col items-center justify-center text-white font-sans">
+  <div class="container mx-auto px-4 text-center">
+   <h1 class="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">⚡ 反應力測試 ⚡</h1><!-- 用戶身份選擇 -->
+   <div id="userSetup" class="mb-8 bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto">
+    <h3 class="text-2xl font-bold mb-4 text-yellow-400">👤 請選擇您的身份</h3>
+    <div class="mb-4"><label class="flex items-center mb-2 cursor-pointer"> <input type="radio" name="userType" value="teacher" class="mr-3 w-4 h-4"> <span class="text-lg">👨‍🏫 老師</span> </label> <label class="flex items-center mb-2 cursor-pointer"> <input type="radio" name="userType" value="student" class="mr-3 w-4 h-4"> <span class="text-lg">👨‍🎓 學生</span> </label> <label class="flex items-center cursor-pointer"> <input type="radio" name="userType" value="guest" class="mr-3 w-4 h-4"> <span class="text-lg">👤 訪客</span> </label>
+    </div><!-- 老師資料輸入 -->
+    <div id="teacherForm" class="hidden mb-4 space-y-3"><input type="text" id="teacherName" placeholder="請輸入全名" class="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none"> <input type="password" id="teacherPassword" placeholder="請輸入教師密碼" class="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+    </div><!-- 學生資料輸入 -->
+    <div id="studentForm" class="hidden mb-4 space-y-3"><select id="studentClass" class="w-full p-3 rounded-lg bg-white/20 text-white border border-white/30 focus:border-yellow-400 focus:outline-none"> <option value="" style="background-color: #1f2937; color: #9ca3af;">請選擇班別</option> <option value="1A" style="background-color: #1f2937; color: #ffffff;">1A</option> <option value="1B" style="background-color: #1f2937; color: #ffffff;">1B</option> <option value="1C" style="background-color: #1f2937; color: #ffffff;">1C</option> <option value="1D" style="background-color: #1f2937; color: #ffffff;">1D</option> <option value="2A" style="background-color: #1f2937; color: #ffffff;">2A</option> <option value="2B" style="background-color: #1f2937; color: #ffffff;">2B</option> <option value="2C" style="background-color: #1f2937; color: #ffffff;">2C</option> <option value="2D" style="background-color: #1f2937; color: #ffffff;">2D</option> <option value="3A" style="background-color: #1f2937; color: #ffffff;">3A</option> <option value="3B" style="background-color: #1f2937; color: #ffffff;">3B</option> <option value="3C" style="background-color: #1f2937; color: #ffffff;">3C</option> <option value="3D" style="background-color: #1f2937; color: #ffffff;">3D</option> <option value="4A" style="background-color: #1f2937; color: #ffffff;">4A</option> <option value="4B" style="background-color: #1f2937; color: #ffffff;">4B</option> <option value="4C" style="background-color: #1f2937; color: #ffffff;">4C</option> <option value="4D" style="background-color: #1f2937; color: #ffffff;">4D</option> <option value="5A" style="background-color: #1f2937; color: #ffffff;">5A</option> <option value="5B" style="background-color: #1f2937; color: #ffffff;">5B</option> <option value="5C" style="background-color: #1f2937; color: #ffffff;">5C</option> <option value="5D" style="background-color: #1f2937; color: #ffffff;">5D</option> <option value="6A" style="background-color: #1f2937; color: #ffffff;">6A</option> <option value="6B" style="background-color: #1f2937; color: #ffffff;">6B</option> <option value="6C" style="background-color: #1f2937; color: #ffffff;">6C</option> <option value="6D" style="background-color: #1f2937; color: #ffffff;">6D</option> </select> <input type="number" id="studentNumber" placeholder="請輸入學號 (1-40)" min="1" max="40" class="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+    </div><button id="confirmUserBtn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-3 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 mb-3"> ✅ 確認 </button> <button id="homeLeaderboardBtn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 px-6 py-3 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200"> 🏆 查看排行榜 </button>
+   </div><!-- 遊戲狀態顯示 -->
+   <div id="gameStatus" class="mb-8 hidden">
+    <div id="instructions" class="text-lg mb-6 bg-white/10 backdrop-blur-sm rounded-lg p-6">
+     <p class="mb-4">🎯 測試您的反應速度！</p>
+     <p class="mb-2">• 按下開始後倒數3秒</p>
+     <p class="mb-2">• 燈泡亮起時立即點擊</p>
+     <p class="mb-2">• 完成20次測試</p>
+     <p>• 查看您的平均反應時間</p>
+    </div>
+    <div id="countdown" class="countdown text-yellow-400 hidden"></div>
+    <div id="progress" class="hidden mb-6">
+     <div class="text-xl mb-2">
+      進度: <span id="currentCount">0</span>/20
+     </div>
+     <div class="w-full bg-gray-700 rounded-full h-3">
+      <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+     </div>
+    </div>
+   </div><!-- 燈泡區域 -->
+   <div id="bulbContainer" class="relative w-full h-96 mb-8 max-w-4xl mx-auto">
+    <div class="bulb bulb-off absolute top-0 left-0" data-bulb="0"></div>
+    <div class="bulb bulb-off absolute top-0 left-1/2 transform -translate-x-1/2" data-bulb="1"></div>
+    <div class="bulb bulb-off absolute top-0 right-0" data-bulb="2"></div>
+    <div class="bulb bulb-off absolute bottom-0 left-0" data-bulb="3"></div>
+    <div class="bulb bulb-off absolute bottom-0 left-1/2 transform -translate-x-1/2" data-bulb="4"></div>
+    <div class="bulb bulb-off absolute bottom-0 right-0" data-bulb="5"></div>
+   </div><!-- 控制按鈕 -->
+   <div class="mb-8"><button id="startBtn" class="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 px-8 py-4 rounded-full text-xl font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden"> 🚀 開始測試 </button> <button id="showTimesBtn" class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 📊 顯示反應時間 </button> <button id="sortTimesBtn" class="bg-gradient-to-r from-teal-500 to-green-600 hover:from-teal-600 hover:to-green-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 🔢 排序數據 </button> <button id="showMedianBtn" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 📈 顯示中位數 </button> <button id="showAverageBtn" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 📊 顯示平均數 </button> <button id="leaderboardBtn" class="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 🏆 排行榜 </button> <button id="resetBtn" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 px-6 py-3 rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200 hidden ml-2"> 🔄 重新開始 </button>
+   </div><!-- 結果顯示 -->
+   <div id="results" class="hidden bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto">
+    <h3 class="text-2xl font-bold mb-4 text-yellow-400">📈 測試結果</h3>
+    <div id="reactionTimes" class="mb-6 hidden">
+     <h4 class="text-lg font-semibold mb-3">各次反應時間 (秒):</h4>
+     <div id="timesList" class="grid grid-cols-5 gap-2 text-sm"></div>
+    </div>
+    <div id="medianResult" class="mb-4 hidden">
+     <h4 class="text-lg font-semibold mb-3">中位數計算:</h4>
+     <div id="medianCalculation" class="bg-black/20 rounded p-4 font-mono text-sm"></div>
+     <div id="medianValue" class="text-2xl font-bold text-green-400 mt-4"></div>
+    </div>
+    <div id="averageResult" class="mb-4 hidden">
+     <h4 class="text-lg font-semibold mb-3">平均數計算:</h4>
+     <div id="averageCalculation" class="bg-black/20 rounded p-4 font-mono text-sm"></div>
+     <div id="averageValue" class="text-2xl font-bold text-orange-400 mt-4"></div>
+    </div><!-- 學生計算驗證 -->
+    <div id="studentCalculation" class="mb-4 hidden">
+     <h4 class="text-lg font-semibold mb-3">📝 請計算您的反應時間統計數據</h4>
+     <div class="bg-yellow-500/20 rounded p-4 mb-4">
+      <p class="text-sm mb-2">⚠️ 學生需要自行計算平均數和中位數才能儲存成績</p>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div><label class="block text-sm font-medium mb-2">您計算的平均數 (秒):</label> <input type="number" id="studentAverage" step="0.001" placeholder="0.000" class="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+      </div>
+      <div><label class="block text-sm font-medium mb-2">您計算的中位數 (秒):</label> <input type="number" id="studentMedian" step="0.001" placeholder="0.000" class="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+      </div>
+     </div><button id="submitCalculationBtn" class="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 px-6 py-3 rounded-lg text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200"> ✅ 提交計算結果 </button>
+     <div id="calculationFeedback" class="mt-4 hidden"></div>
+    </div>
+   </div><!-- 排行榜 -->
+   <div id="leaderboard" class="hidden bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-4xl mx-auto">
+    <h3 class="text-2xl font-bold mb-4 text-yellow-400">🏆 反應力排行榜</h3>
+    <div class="mb-4 flex flex-wrap gap-2 justify-center"><button id="showAllBtn" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200"> 👥 所有用戶 </button> <button id="showStudentsBtn" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200"> 👨‍🎓 學生 </button> <button id="showTeachersBtn" class="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200"> 👨‍🏫 老師 </button> <button id="closeLeaderboardBtn" class="bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200"> ❌ 關閉 </button>
+    </div>
+    <div id="leaderboardContent" class="bg-black/20 rounded-lg p-4">
+     <div id="leaderboardList" class="space-y-2"></div>
+    </div>
+   </div>
+  </div>
+  <script>
+        class ReactionTest {
+            constructor() {
+                this.reactionTimes = [];
+                this.currentCount = 0;
+                this.totalTests = 20;
+                this.gameStarted = false;
+                this.waitingForClick = false;
+                this.currentLitBulb = -1;
+                this.startTime = 0;
+                this.userType = null;
+                this.userData = {};
+                this.calculatedAverage = 0;
+                this.calculatedMedian = 0;
+                
+                this.initializeElements();
+                this.bindEvents();
+            }
+            
+            initializeElements() {
+                // 用戶設置相關
+                this.userSetup = document.getElementById('userSetup');
+                this.confirmUserBtn = document.getElementById('confirmUserBtn');
+                this.homeLeaderboardBtn = document.getElementById('homeLeaderboardBtn');
+                this.teacherForm = document.getElementById('teacherForm');
+                this.studentForm = document.getElementById('studentForm');
+                this.teacherName = document.getElementById('teacherName');
+                this.teacherPassword = document.getElementById('teacherPassword');
+                this.studentClass = document.getElementById('studentClass');
+                this.studentNumber = document.getElementById('studentNumber');
+                
+                // 遊戲相關
+                this.gameStatus = document.getElementById('gameStatus');
+                this.startBtn = document.getElementById('startBtn');
+                this.showTimesBtn = document.getElementById('showTimesBtn');
+                this.sortTimesBtn = document.getElementById('sortTimesBtn');
+                this.showMedianBtn = document.getElementById('showMedianBtn');
+                this.showAverageBtn = document.getElementById('showAverageBtn');
+                this.leaderboardBtn = document.getElementById('leaderboardBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.countdown = document.getElementById('countdown');
+                this.progress = document.getElementById('progress');
+                this.currentCountEl = document.getElementById('currentCount');
+                this.progressBar = document.getElementById('progressBar');
+                this.bulbs = document.querySelectorAll('.bulb');
+                this.results = document.getElementById('results');
+                this.instructions = document.getElementById('instructions');
+                this.reactionTimesDiv = document.getElementById('reactionTimes');
+                this.medianResultDiv = document.getElementById('medianResult');
+                this.averageResultDiv = document.getElementById('averageResult');
+                
+                // 學生計算驗證
+                this.studentCalculation = document.getElementById('studentCalculation');
+                this.studentAverage = document.getElementById('studentAverage');
+                this.studentMedian = document.getElementById('studentMedian');
+                this.submitCalculationBtn = document.getElementById('submitCalculationBtn');
+                this.calculationFeedback = document.getElementById('calculationFeedback');
+                
+                // 排行榜
+                this.leaderboard = document.getElementById('leaderboard');
+                this.showAllBtn = document.getElementById('showAllBtn');
+                this.showStudentsBtn = document.getElementById('showStudentsBtn');
+                this.showTeachersBtn = document.getElementById('showTeachersBtn');
+                this.closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
+                this.leaderboardList = document.getElementById('leaderboardList');
+            }
+            
+            bindEvents() {
+                // 用戶設置事件
+                document.querySelectorAll('input[name="userType"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => this.handleUserTypeChange(e));
+                });
+                this.confirmUserBtn.addEventListener('click', () => this.confirmUser());
+                this.homeLeaderboardBtn.addEventListener('click', () => this.showLeaderboard());
+                
+                // 遊戲事件
+                this.startBtn.addEventListener('click', () => this.startGame());
+                this.showTimesBtn.addEventListener('click', () => this.showReactionTimes());
+                this.sortTimesBtn.addEventListener('click', () => this.sortReactionTimes());
+                this.showMedianBtn.addEventListener('click', () => this.showMedian());
+                this.showAverageBtn.addEventListener('click', () => this.showAverage());
+                this.leaderboardBtn.addEventListener('click', () => this.showLeaderboard());
+                this.resetBtn.addEventListener('click', () => this.resetGame());
+                
+                // 學生計算驗證
+                this.submitCalculationBtn.addEventListener('click', () => this.submitCalculation());
+                
+                // 排行榜事件
+                this.showAllBtn.addEventListener('click', () => this.loadLeaderboard('all'));
+                this.showStudentsBtn.addEventListener('click', () => this.loadLeaderboard('student'));
+                this.showTeachersBtn.addEventListener('click', () => this.loadLeaderboard('teacher'));
+                this.closeLeaderboardBtn.addEventListener('click', () => this.hideLeaderboard());
+                
+                this.bulbs.forEach(bulb => {
+                    bulb.addEventListener('click', (e) => this.handleBulbClick(e));
+                });
+            }
+            
+            handleUserTypeChange(e) {
+                const userType = e.target.value;
+                this.teacherForm.classList.add('hidden');
+                this.studentForm.classList.add('hidden');
+                
+                if (userType === 'teacher') {
+                    this.teacherForm.classList.remove('hidden');
+                } else if (userType === 'student') {
+                    this.studentForm.classList.remove('hidden');
+                }
+            }
+            
+            confirmUser() {
+                const selectedType = document.querySelector('input[name="userType"]:checked');
+                if (!selectedType) {
+                    alert('請選擇您的身份！');
+                    return;
+                }
+                
+                this.userType = selectedType.value;
+                
+                if (this.userType === 'teacher') {
+                    const name = this.teacherName.value.trim();
+                    const password = this.teacherPassword.value.trim();
+                    
+                    if (!name) {
+                        alert('請輸入您的全名！');
+                        return;
+                    }
+                    
+                    if (password !== '23879988') {
+                        alert('教師密碼錯誤！');
+                        return;
+                    }
+                    
+                    this.userData = {
+                        type: 'teacher',
+                        name: name
+                    };
+                } else if (this.userType === 'student') {
+                    const className = this.studentClass.value;
+                    const number = parseInt(this.studentNumber.value);
+                    
+                    if (!className) {
+                        alert('請選擇班別！');
+                        return;
+                    }
+                    
+                    if (!number || number < 1 || number > 40) {
+                        alert('請輸入有效的學號 (1-40)！');
+                        return;
+                    }
+                    
+                    this.userData = {
+                        type: 'student',
+                        class: className,
+                        number: number
+                    };
+                } else if (this.userType === 'guest') {
+                    this.userData = {
+                        type: 'guest'
+                    };
+                }
+                
+                // 隱藏用戶設置，顯示遊戲界面
+                this.userSetup.classList.add('hidden');
+                this.gameStatus.classList.remove('hidden');
+                this.startBtn.classList.remove('hidden');
+                this.startBtn.style.display = 'inline-block';
+                this.progress.classList.remove('hidden');
+                
+                console.log('用戶確認完成，開始測試按鈕已顯示');
+            }
+            
+            async startGame() {
+                this.startBtn.style.display = 'none';
+                this.instructions.style.display = 'none';
+                this.countdown.classList.remove('hidden');
+                
+                // 倒數3秒
+                for (let i = 3; i > 0; i--) {
+                    this.countdown.textContent = i;
+                    await this.sleep(1000);
+                }
+                
+                this.countdown.textContent = 'GO!';
+                this.countdown.style.color = '#10b981';
+                await this.sleep(500);
+                
+                this.countdown.classList.add('hidden');
+                this.gameStarted = true;
+                
+                this.nextRound();
+            }
+            
+            nextRound() {
+                if (this.currentCount >= this.totalTests) {
+                    this.endGame();
+                    return;
+                }
+                
+                // 隨機選擇一個燈泡亮起
+                const availableBulbs = [0, 1, 2, 3, 4, 5].filter(i => i !== this.currentLitBulb);
+                this.currentLitBulb = availableBulbs[Math.floor(Math.random() * availableBulbs.length)];
+                
+                // 立即亮燈
+                this.lightBulb(this.currentLitBulb);
+                this.startTime = Date.now();
+                this.waitingForClick = true;
+            }
+            
+            lightBulb(index) {
+                this.bulbs.forEach((bulb, i) => {
+                    if (i === index) {
+                        bulb.classList.remove('bulb-off');
+                        bulb.classList.add('bulb-on');
+                    } else {
+                        bulb.classList.remove('bulb-on');
+                        bulb.classList.add('bulb-off');
+                    }
+                });
+            }
+            
+            handleBulbClick(e) {
+                if (!this.gameStarted || !this.waitingForClick) return;
+                
+                const clickedBulb = parseInt(e.target.dataset.bulb);
+                
+                if (clickedBulb === this.currentLitBulb) {
+                    // 正確點擊，轉換為秒並捨入至3位小數
+                    const reactionTime = Math.round((Date.now() - this.startTime) / 10) / 100;
+                    this.reactionTimes.push(reactionTime);
+                    this.currentCount++;
+                    
+                    // 更新進度
+                    this.currentCountEl.textContent = this.currentCount;
+                    this.progressBar.style.width = `${(this.currentCount / this.totalTests) * 100}%`;
+                    
+                    // 熄滅燈泡
+                    e.target.classList.remove('bulb-on');
+                    e.target.classList.add('bulb-off');
+                    
+                    this.waitingForClick = false;
+                    
+                    // 立即進行下一輪
+                    this.nextRound();
+                }
+            }
+            
+            endGame() {
+                this.gameStarted = false;
+                this.showTimesBtn.classList.remove('hidden');
+                this.leaderboardBtn.classList.remove('hidden');
+                this.resetBtn.classList.remove('hidden');
+                
+                // 計算統計數據
+                this.calculateStats();
+                
+                // 根據用戶類型顯示不同按鈕
+                if (this.userType === 'teacher') {
+                    this.showMedianBtn.classList.remove('hidden');
+                    this.showAverageBtn.classList.remove('hidden');
+                    // 老師直接儲存數據
+                    this.saveToDatabase();
+                } else if (this.userType === 'student') {
+                    // 學生顯示排序按鈕
+                    this.sortTimesBtn.classList.remove('hidden');
+                    // 學生需要自行計算
+                    this.showStudentCalculation();
+                } else if (this.userType === 'guest') {
+                    // 訪客直接顯示結果，不儲存數據
+                    this.showMedianBtn.classList.remove('hidden');
+                    this.showAverageBtn.classList.remove('hidden');
+                }
+                
+                // 熄滅所有燈泡
+                this.bulbs.forEach(bulb => {
+                    bulb.classList.remove('bulb-on');
+                    bulb.classList.add('bulb-off');
+                });
+            }
+            
+            calculateStats() {
+                // 計算平均數（使用已捨入的數據）
+                const sum = this.reactionTimes.reduce((a, b) => a + b, 0);
+                this.calculatedAverage = Math.round((sum / this.reactionTimes.length) * 1000) / 1000;
+                
+                // 計算中位數（使用已捨入的數據）
+                const sortedTimes = [...this.reactionTimes].sort((a, b) => a - b);
+                const n = sortedTimes.length;
+                if (n % 2 === 0) {
+                    this.calculatedMedian = Math.round(((sortedTimes[n/2 - 1] + sortedTimes[n/2]) / 2) * 1000) / 1000;
+                } else {
+                    this.calculatedMedian = sortedTimes[Math.floor(n/2)];
+                }
+            }
+            
+            showStudentCalculation() {
+                this.results.classList.remove('hidden');
+                this.reactionTimesDiv.classList.remove('hidden');
+                this.studentCalculation.classList.remove('hidden');
+                this.medianResultDiv.classList.add('hidden');
+                this.averageResultDiv.classList.add('hidden');
+                
+                // 顯示反應時間
+                const timesList = document.getElementById('timesList');
+                timesList.innerHTML = '';
+                this.reactionTimes.forEach((time, index) => {
+                    const timeEl = document.createElement('div');
+                    timeEl.className = 'bg-blue-500/30 rounded p-2';
+                    timeEl.textContent = `${index + 1}: ${time.toFixed(2)}s`;
+                    timesList.appendChild(timeEl);
+                });
+            }
+            
+            submitCalculation() {
+                const userAverage = parseFloat(this.studentAverage.value);
+                const userMedian = parseFloat(this.studentMedian.value);
+                
+                if (isNaN(userAverage) || isNaN(userMedian)) {
+                    this.showCalculationFeedback('請輸入有效的數值！', 'error');
+                    return;
+                }
+                
+                // 檢查計算是否正確（允許小誤差）
+                const averageCorrect = Math.abs(userAverage - this.calculatedAverage) < 0.005;
+                const medianCorrect = Math.abs(userMedian - this.calculatedMedian) < 0.005;
+                
+                if (averageCorrect && medianCorrect) {
+                    if (this.userType === 'student') {
+                        this.showCalculationFeedback('🎉 計算正確！您的成績已儲存。', 'success');
+                        this.saveToDatabase();
+                    } else {
+                        this.showCalculationFeedback('🎉 計算正確！', 'success');
+                    }
+                    this.showMedianBtn.classList.remove('hidden');
+                    this.showAverageBtn.classList.remove('hidden');
+                } else {
+                    let message = '❌ 計算錯誤，請重新計算：\n';
+                    if (!averageCorrect) {
+                        message += `• 平均數計算錯誤\n`;
+                    }
+                    if (!medianCorrect) {
+                        message += `• 中位數計算錯誤\n`;
+                    }
+                    this.showCalculationFeedback(message, 'error');
+                }
+            }
+            
+            showCalculationFeedback(message, type) {
+                this.calculationFeedback.classList.remove('hidden');
+                this.calculationFeedback.innerHTML = `
+                    <div class="p-4 rounded-lg ${type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}">
+                        ${message.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            }
+            
+            async saveToDatabase() {
+                // 訪客不儲存數據
+                if (this.userType === 'guest') {
+                    console.log('訪客模式，不儲存數據');
+                    return;
+                }
+                
+                const data = {
+                    ...this.userData,
+                    reactionTimes: this.reactionTimes,
+                    average: this.calculatedAverage,
+                    median: this.calculatedMedian,
+                    timestamp: Date.now(),
+                    date: new Date().toISOString()
+                };
+                
+                // 先儲存到本地存儲，確保數據不會丟失
+                try {
+                    let scores = JSON.parse(localStorage.getItem('reactionScores') || '[]');
+                    scores.push(data);
+                    localStorage.setItem('reactionScores', JSON.stringify(scores));
+                    console.log('數據已儲存到本地存儲');
+                } catch (localError) {
+                    console.error('本地存儲失敗:', localError);
+                }
+                
+                // 嘗試同步到Firebase（不阻塞主流程）
+                try {
+                    if (window.firebaseDatabase && window.firebaseRef && window.firebasePush) {
+                        const scoresRef = window.firebaseRef(window.firebaseDatabase, 'reactionScores');
+                        
+                        // 使用較短的超時時間，避免長時間等待
+                        const firebasePromise = window.firebasePush(scoresRef, data);
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Firebase操作超時')), 2000)
+                        );
+                        
+                        await Promise.race([firebasePromise, timeoutPromise]);
+                        console.log('數據已同步到 Firebase');
+                    }
+                } catch (firebaseError) {
+                    console.warn('Firebase同步失敗（數據已保存在本地）:', firebaseError.message || firebaseError);
+                }
+            }
+            
+            showReactionTimes() {
+                this.results.classList.remove('hidden');
+                this.reactionTimesDiv.classList.remove('hidden');
+                this.medianResultDiv.classList.add('hidden');
+                this.averageResultDiv.classList.add('hidden');
+                
+                // 顯示各次時間
+                const timesList = document.getElementById('timesList');
+                timesList.innerHTML = '';
+                this.reactionTimes.forEach((time, index) => {
+                    const timeEl = document.createElement('div');
+                    timeEl.className = 'bg-blue-500/30 rounded p-2';
+                    timeEl.textContent = `${index + 1}: ${time.toFixed(2)}s`;
+                    timesList.appendChild(timeEl);
+                });
+            }
+            
+            sortReactionTimes() {
+                this.results.classList.remove('hidden');
+                this.reactionTimesDiv.classList.remove('hidden');
+                this.medianResultDiv.classList.add('hidden');
+                this.averageResultDiv.classList.add('hidden');
+                
+                // 排序反應時間（由小至大）
+                const sortedTimes = [...this.reactionTimes].sort((a, b) => a - b);
+                
+                // 顯示排序後的時間
+                const timesList = document.getElementById('timesList');
+                timesList.innerHTML = '';
+                
+                // 添加提示標題
+                const header = document.createElement('div');
+                header.className = 'col-span-5 bg-green-500/30 rounded p-3 mb-2 text-center font-bold';
+                header.textContent = '📊 反應時間已由小至大排列';
+                timesList.appendChild(header);
+                
+                sortedTimes.forEach((time, index) => {
+                    const timeEl = document.createElement('div');
+                    timeEl.className = 'bg-green-500/30 rounded p-2 border-2 border-green-400/50';
+                    timeEl.textContent = `第 ${index + 1} 名: ${time.toFixed(2)}s`;
+                    timesList.appendChild(timeEl);
+                });
+            }
+            
+            showMedian() {
+                this.results.classList.remove('hidden');
+                this.reactionTimesDiv.classList.add('hidden');
+                this.medianResultDiv.classList.remove('hidden');
+                this.averageResultDiv.classList.add('hidden');
+                
+                // 計算中位數
+                const sortedTimes = [...this.reactionTimes].sort((a, b) => a - b);
+                const n = sortedTimes.length;
+                let median;
+                let calculation;
+                
+                if (n % 2 === 0) {
+                    // 偶數個數據
+                    const mid1 = sortedTimes[n/2 - 1];
+                    const mid2 = sortedTimes[n/2];
+                    median = (mid1 + mid2) / 2;
+                    calculation = `
+                        <div class="mb-2">資料個數: ${n} (偶數)</div>
+                        <div class="mb-2">排序後的資料: ${sortedTimes.map(t => t.toFixed(3)).join(', ')}</div>
+                        <div class="mb-2">中間兩個數值: ${mid1.toFixed(3)}s 和 ${mid2.toFixed(3)}s</div>
+                        <div class="text-yellow-400">中位數 = (${mid1.toFixed(3)} + ${mid2.toFixed(3)}) ÷ 2 = ${median.toFixed(3)}s</div>
+                    `;
+                } else {
+                    // 奇數個數據
+                    median = sortedTimes[Math.floor(n/2)];
+                    calculation = `
+                        <div class="mb-2">資料個數: ${n} (奇數)</div>
+                        <div class="mb-2">排序後的資料: ${sortedTimes.map(t => t.toFixed(3)).join(', ')}</div>
+                        <div class="mb-2">中間位置: 第 ${Math.floor(n/2) + 1} 個數值</div>
+                        <div class="text-yellow-400">中位數 = ${median.toFixed(3)}s</div>
+                    `;
+                }
+                
+                document.getElementById('medianCalculation').innerHTML = calculation;
+                document.getElementById('medianValue').textContent = `📊 反應時間中位數: ${median.toFixed(3)} 秒`;
+            }
+            
+            showAverage() {
+                this.results.classList.remove('hidden');
+                this.reactionTimesDiv.classList.add('hidden');
+                this.medianResultDiv.classList.add('hidden');
+                this.averageResultDiv.classList.remove('hidden');
+                
+                // 計算平均數
+                const sum = this.reactionTimes.reduce((a, b) => a + b, 0);
+                const average = sum / this.reactionTimes.length;
+                
+                // 顯示計算步驟
+                const timesStr = this.reactionTimes.map(t => t.toFixed(3)).join(' + ');
+                const calculation = `
+                    <div class="mb-2">平均數 = 總和 ÷ 次數</div>
+                    <div class="mb-2">總和 = ${timesStr} = ${sum.toFixed(3)}s</div>
+                    <div class="mb-2">次數 = ${this.reactionTimes.length}</div>
+                    <div class="text-yellow-400">平均數 = ${sum.toFixed(3)} ÷ ${this.reactionTimes.length} = ${average.toFixed(3)}s</div>
+                `;
+                
+                document.getElementById('averageCalculation').innerHTML = calculation;
+                document.getElementById('averageValue').textContent = `🎯 反應時間平均數: ${average.toFixed(3)} 秒`;
+            }
+            
+            showLeaderboard() {
+                this.leaderboard.classList.remove('hidden');
+                this.loadLeaderboard('all');
+            }
+            
+            hideLeaderboard() {
+                this.leaderboard.classList.add('hidden');
+            }
+            
+            async loadLeaderboard(filter = 'all') {
+                // 顯示載入中
+                this.leaderboardList.innerHTML = '<div class="text-center text-yellow-400">載入中...</div>';
+                
+                let scores = [];
+                
+                // 先載入本地數據，確保有基本顯示
+                try {
+                    scores = JSON.parse(localStorage.getItem('reactionScores') || '[]')
+                        .filter(score => score && score.average && (filter === 'all' || score.type === filter))
+                        .sort((a, b) => a.average - b.average)
+                        .slice(0, 20);
+                    console.log('從本地存儲載入排行榜數據');
+                } catch (localError) {
+                    console.error('本地數據載入失敗:', localError);
+                    scores = [];
+                }
+                
+                // 嘗試從Firebase載入更新數據（不阻塞顯示）
+                try {
+                    if (window.firebaseDatabase && window.firebaseRef && window.firebaseOnValue) {
+                        const scoresRef = window.firebaseRef(window.firebaseDatabase, 'reactionScores');
+                        
+                        // 設置較短的超時時間
+                        const firebasePromise = new Promise((resolve, reject) => {
+                            let unsubscribed = false;
+                            const unsubscribe = window.firebaseOnValue(scoresRef, (snapshot) => {
+                                if (unsubscribed) return;
+                                unsubscribed = true;
+                                try {
+                                    const data = snapshot.val();
+                                    if (data) {
+                                        const scoresArray = Object.values(data)
+                                            .filter(score => score && score.average && (filter === 'all' || score.type === filter))
+                                            .sort((a, b) => a.average - b.average)
+                                            .slice(0, 20);
+                                        resolve(scoresArray);
+                                    } else {
+                                        resolve([]);
+                                    }
+                                } catch (err) {
+                                    reject(err);
+                                }
+                            }, (error) => {
+                                if (!unsubscribed) {
+                                    unsubscribed = true;
+                                    reject(error);
+                                }
+                            });
+                            
+                            // 超時處理
+                            setTimeout(() => {
+                                if (!unsubscribed) {
+                                    unsubscribed = true;
+                                    if (unsubscribe) unsubscribe();
+                                    reject(new Error('Firebase載入超時'));
+                                }
+                            }, 2000);
+                        });
+                        
+                        const firebaseScores = await firebasePromise;
+                        scores = firebaseScores;
+                        console.log('從Firebase更新排行榜數據');
+                    }
+                } catch (firebaseError) {
+                    console.warn('Firebase載入失敗，使用本地數據:', firebaseError.message || firebaseError);
+                }
+                
+                // 顯示排行榜
+                if (scores.length === 0) {
+                    this.leaderboardList.innerHTML = '<div class="text-center text-gray-400">暫無數據</div>';
+                } else {
+                    this.displayLeaderboard(scores);
+                }
+            }
+            
+            displayLeaderboard(scores) {
+                if (scores.length === 0) {
+                    this.leaderboardList.innerHTML = '<div class="text-center text-gray-400">暫無數據</div>';
+                    return;
+                }
+                
+                // 去除重複用戶，只保留最佳成績
+                const uniqueScores = this.getUniqueUsersBestScores(scores);
+                
+                // 創建標題列
+                const headerRow = `
+                    <div class="flex items-center justify-between p-3 bg-yellow-500/20 rounded-lg border-2 border-yellow-400/50 mb-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-lg font-bold w-12 text-yellow-300 whitespace-nowrap">排名</span>
+                            <span class="text-lg font-bold text-yellow-300 whitespace-nowrap">挑戰者</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-yellow-300 whitespace-nowrap">最佳平均反應時間</div>
+                        </div>
+                    </div>
+                `;
+                
+                // 創建數據列
+                const dataRows = uniqueScores.map((score, index) => {
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                    const userIcon = score.type === 'teacher' ? '👨‍🏫' : '👨‍🎓';
+                    const userInfo = score.type === 'teacher' 
+                        ? `${score.name}老師` 
+                        : `${score.class} ${score.number}號`;
+                    
+                    return `
+                        <div class="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold w-8">${medal}</span>
+                                <span class="text-lg">${userIcon}</span>
+                                <span class="font-medium">${userInfo}</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-green-400">${score.average.toFixed(3)}s</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                this.leaderboardList.innerHTML = headerRow + dataRows;
+            }
+            
+            getUniqueUsersBestScores(scores) {
+                const userMap = new Map();
+                
+                // 遍歷所有成績，為每個用戶保留最佳成績
+                scores.forEach(score => {
+                    let userKey;
+                    if (score.type === 'teacher') {
+                        userKey = `teacher_${score.name}`;
+                    } else {
+                        userKey = `student_${score.class}_${score.number}`;
+                    }
+                    
+                    // 如果用戶不存在或當前成績更好，則更新記錄
+                    if (!userMap.has(userKey) || score.average < userMap.get(userKey).average) {
+                        userMap.set(userKey, score);
+                    }
+                });
+                
+                // 轉換為陣列並按平均時間排序
+                return Array.from(userMap.values()).sort((a, b) => a.average - b.average);
+            }
+            
+            resetGame() {
+                // 完全重置所有遊戲狀態
+                this.reactionTimes = [];
+                this.currentCount = 0;
+                this.gameStarted = false;
+                this.waitingForClick = false;
+                this.currentLitBulb = -1;
+                this.calculatedAverage = 0;
+                this.calculatedMedian = 0;
+                this.userType = null;
+                this.userData = {};
+                
+                // 隱藏所有遊戲相關元素
+                this.gameStatus.classList.add('hidden');
+                this.startBtn.classList.add('hidden');
+                this.showTimesBtn.classList.add('hidden');
+                this.sortTimesBtn.classList.add('hidden');
+                this.showMedianBtn.classList.add('hidden');
+                this.showAverageBtn.classList.add('hidden');
+                this.leaderboardBtn.classList.add('hidden');
+                this.resetBtn.classList.add('hidden');
+                this.countdown.classList.add('hidden');
+                this.progress.classList.add('hidden');
+                this.results.classList.add('hidden');
+                this.studentCalculation.classList.add('hidden');
+                this.calculationFeedback.classList.add('hidden');
+                this.leaderboard.classList.add('hidden');
+                
+                // 顯示用戶設置界面
+                this.userSetup.classList.remove('hidden');
+                
+                // 重置所有表單
+                document.querySelectorAll('input[name="userType"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                this.teacherForm.classList.add('hidden');
+                this.studentForm.classList.add('hidden');
+                
+                // 清空所有輸入框
+                this.teacherName.value = '';
+                this.teacherPassword.value = '';
+                this.studentClass.value = '';
+                this.studentNumber.value = '';
+                this.studentAverage.value = '';
+                this.studentMedian.value = '';
+                
+                // 重置進度顯示
+                this.currentCountEl.textContent = '0';
+                this.progressBar.style.width = '0%';
+                this.countdown.style.color = '#fbbf24';
+                this.instructions.style.display = 'block';
+                
+                // 熄滅所有燈泡
+                this.bulbs.forEach(bulb => {
+                    bulb.classList.remove('bulb-on');
+                    bulb.classList.add('bulb-off');
+                });
+                
+                console.log('遊戲已重置，回到身份選擇畫面');
+            }
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // 初始化遊戲
+        document.addEventListener('DOMContentLoaded', () => {
+            new ReactionTest();
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c571df3609c77c5',t:'MTc2OTY3Mjc5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
