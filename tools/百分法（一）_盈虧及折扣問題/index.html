@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百分法小測試</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-correct { animation: pulseCorrect 0.6s ease-in-out; }
+        @keyframes pulseCorrect { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); background-color: #10b981; } }
+        .shake-wrong { animation: shakeWrong 0.5s ease-in-out; }
+        @keyframes shakeWrong { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .fraction { display: inline-block; vertical-align: middle; text-align: center; }
+        .fraction .numerator { display: block; border-bottom: 1px solid #000; padding-bottom: 2px; }
+        .fraction .denominator { display: block; padding-top: 2px; }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8"><!-- 標題 -->
+   <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold text-indigo-800 mb-2">📊 百分法小測試</h1>
+    <p class="text-lg text-gray-600">測試你對成本、標價、售價、折扣、盈利等概念的掌握程度</p>
+   </div><!-- 主選單 -->
+   <div id="mainMenu" class="max-w-4xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-6 mb-8"><!-- 程度一 -->
+     <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+      <div class="text-center">
+       <div class="text-3xl mb-3">
+        🟢
+       </div>
+       <h3 class="text-xl font-semibold text-gray-800 mb-2">程度一 - 初階</h3>
+       <p class="text-gray-600 mb-4">基礎概念測試<br>
+        共12題</p>
+       <div id="level1Score" class="text-sm text-green-600 mb-2 hidden">
+        最佳成績: <span class="font-semibold"></span>
+       </div><button onclick="startLevel(1)" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"> 開始測驗 </button>
+      </div>
+     </div><!-- 程度二 -->
+     <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+      <div class="text-center">
+       <div class="text-3xl mb-3">
+        🟡
+       </div>
+       <h3 class="text-xl font-semibold text-gray-800 mb-2">程度二 - 中階</h3>
+       <p class="text-gray-600 mb-4">一般文字題<br>
+        共6題</p>
+       <div id="level2Score" class="text-sm text-yellow-600 mb-2 hidden">
+        最佳成績: <span class="font-semibold"></span>
+       </div><button onclick="startLevel(2)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"> 開始測驗 </button>
+      </div>
+     </div><!-- 程度三 -->
+     <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+      <div class="text-center">
+       <div class="text-3xl mb-3">
+        🔴
+       </div>
+       <h3 class="text-xl font-semibold text-gray-800 mb-2">程度三 - 進階</h3>
+       <p class="text-gray-600 mb-4">較複雜的問題<br>
+        共4題</p>
+       <div id="level3Score" class="text-sm text-red-600 mb-2 hidden">
+        最佳成績: <span class="font-semibold"></span>
+       </div><button onclick="startLevel(3)" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"> 開始測驗 </button>
+      </div>
+     </div>
+    </div><!-- 公式參考 -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+     <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 公式參考</h3>
+     <div class="grid md:grid-cols-2 gap-4 text-sm">
+      <div>
+       <p class="mb-2"><strong>盈利相關：</strong></p>
+       <ul class="space-y-1 text-gray-700">
+        <li>• 盈利 = 售價 - 成本</li>
+        <li>• 盈利百分率 = <span class="fraction"><span class="numerator">盈利</span><span class="denominator">成本</span></span> × 100%</li>
+        <li>• 盈利 = 成本 × 盈利百分率</li>
+        <li>• 售價 = 成本 × (1+盈利百分率)</li>
+       </ul>
+      </div>
+      <div>
+       <p class="mb-2"><strong>虧蝕相關：</strong></p>
+       <ul class="space-y-1 text-gray-700">
+        <li>• 虧蝕 = 成本 - 售價</li>
+        <li>• 虧蝕百分率 = <span class="fraction"><span class="numerator">虧蝕</span><span class="denominator">成本</span></span> × 100%</li>
+        <li>• 虧蝕 = 成本 × 虧蝕百分率</li>
+        <li>• 售價 = 成本 × (1-虧蝕百分率)</li>
+       </ul>
+      </div>
+      <div>
+       <p class="mb-2"><strong>折扣相關：</strong></p>
+       <ul class="space-y-1 text-gray-700">
+        <li>• 折扣 = 標價 - 售價</li>
+        <li>• 折扣百分率 = <span class="fraction"><span class="numerator">折扣</span><span class="denominator">標價</span></span> × 100%</li>
+        <li>• 折扣 = 標價 × 折扣百分率</li>
+        <li>• 售價 = 標價 × (1-折扣百分率)</li>
+       </ul>
+      </div>
+     </div>
+    </div>
+   </div><!-- 測驗介面 -->
+   <div id="quizInterface" class="hidden max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+     <div class="flex justify-between items-center mb-4">
+      <h2 id="quizTitle" class="text-2xl font-semibold text-gray-800"></h2><button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">返回主選單</button>
+     </div>
+     <div class="flex justify-between items-center mb-6">
+      <div class="text-lg"><span class="text-gray-600">題目：</span> <span id="questionNumber" class="font-semibold">1</span> <span class="text-gray-600"> / </span> <span id="totalQuestions" class="font-semibold">12</span>
+      </div>
+      <div class="text-lg"><span class="text-gray-600">得分：</span> <span id="currentScore" class="font-semibold text-green-600">0</span>
+      </div>
+     </div>
+     <div class="w-full bg-gray-200 rounded-full h-2 mb-6">
+      <div id="progressBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+     </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-lg p-6">
+     <div id="questionContent" class="mb-6">
+      <h3 id="questionText" class="text-xl font-medium text-gray-800 mb-4"></h3>
+      <div class="space-y-3">
+       <div class="flex items-center space-x-2"><input type="text" id="answerInput" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-lg" placeholder="請在此輸入答案">
+       </div>
+       <div class="flex gap-3"><button onclick="submitAnswer()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium">提交答案</button> ${currentLevel === 3 ? '' : '<button onclick="showHint()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium">💡 提示</button>'}
+       </div>
+      </div>
+     </div>
+     <div id="hintSection" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+      <h4 class="font-semibold text-yellow-800 mb-2">💡 提示：</h4>
+      <p id="hintText" class="text-yellow-700"></p>
+     </div>
+     <div id="resultSection" class="hidden">
+      <div id="resultMessage" class="p-4 rounded-lg mb-4"></div><button onclick="nextQuestion()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium">下一題</button>
+     </div>
+    </div>
+   </div><!-- 結果頁面 -->
+   <div id="resultPage" class="hidden max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+     <div id="resultIcon" class="text-6xl mb-4"></div>
+     <h2 id="resultTitle" class="text-3xl font-bold mb-4"></h2>
+     <div id="resultStats" class="text-xl mb-6"></div>
+     <div id="passCodeSection" class="hidden bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+      <h3 class="font-semibold text-green-800 mb-2">🎉 恭喜！你獲得了通關密碼：</h3>
+      <div id="passCode" class="text-2xl font-mono bg-green-100 px-4 py-2 rounded border-2 border-green-300"></div>
+     </div><button onclick="backToMenu()" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium">返回主選單</button>
+    </div>
+   </div>
+  </div>
+  <script>
+        // 全域變數
+        let currentLevel = 1;
+        let currentQuestion = 0;
+        let score = 0;
+        let questions = [];
+        let levelScores = { 1: 0, 2: 0, 3: 0 };
+
+        // 程度一題庫（每個公式10道題）
+        const level1QuestionBank = [
+            // 公式1: 盈利 = 售價 - 成本
+            [
+                { question: "一件商品成本為$200，售價為$250，求盈利。", answer: 50, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一本書成本為$80，售價為$120，求盈利。", answer: 40, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一件衣服成本為$150，售價為$200，求盈利。", answer: 50, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一部手機成本為$800，售價為$1000，求盈利。", answer: 200, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一雙鞋成本為$300，售價為$450，求盈利。", answer: 150, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一個背包成本為$120，售價為$180，求盈利。", answer: 60, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一支筆成本為$5，售價為$8，求盈利。", answer: 3, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一台電腦成本為$5000，售價為$6500，求盈利。", answer: 1500, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一件玩具成本為$50，售價為$75，求盈利。", answer: 25, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" },
+                { question: "一個杯子成本為$20，售價為$35，求盈利。", answer: 15, unit: "$", hint: "使用公式：盈利 = 售價 - 成本" }
+            ],
+            // 公式2: 盈利百分率 = 盈利/成本 × 100%
+            [
+                { question: "一件商品成本為$300，盈利為$60，求盈利百分率。", answer: 20, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一本書成本為$100，盈利為$25，求盈利百分率。", answer: 25, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一件衣服成本為$200，盈利為$50，求盈利百分率。", answer: 25, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一部手機成本為$800，盈利為$160，求盈利百分率。", answer: 20, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一雙鞋成本為$400，盈利為$120，求盈利百分率。", answer: 30, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一個背包成本為$150，盈利為$45，求盈利百分率。", answer: 30, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一支筆成本為$10，盈利為$2，求盈利百分率。", answer: 20, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一台電腦成本為$6000，盈利為$900，求盈利百分率。", answer: 15, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一件玩具成本為$80，盈利為$24，求盈利百分率。", answer: 30, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" },
+                { question: "一個杯子成本為$25，盈利為$5，求盈利百分率。", answer: 20, unit: "%", hint: "使用公式：盈利百分率 = 盈利/成本 × 100%" }
+            ],
+            // 公式3: 盈利 = 成本 × 盈利百分率
+            [
+                { question: "一件商品成本為$400，盈利百分率為15%，求盈利。", answer: 60, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一本書成本為$120，盈利百分率為25%，求盈利。", answer: 30, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一件衣服成本為$200，盈利百分率為30%，求盈利。", answer: 60, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一部手機成本為$1000，盈利百分率為18%，求盈利。", answer: 180, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一雙鞋成本為$300，盈利百分率為40%，求盈利。", answer: 120, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一個背包成本為$150，盈利百分率為20%，求盈利。", answer: 30, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一支筆成本為$8，盈利百分率為25%，求盈利。", answer: 2, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一台電腦成本為$5000，盈利百分率為22%，求盈利。", answer: 1100, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一件玩具成本為$60，盈利百分率為35%，求盈利。", answer: 21, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" },
+                { question: "一個杯子成本為$40，盈利百分率為15%，求盈利。", answer: 6, unit: "$", hint: "使用公式：盈利 = 成本 × 盈利百分率" }
+            ],
+            // 公式4: 售價 = 成本 × (1+盈利百分率)
+            [
+                { question: "一件商品成本為$500，盈利百分率為20%，求售價。", answer: 600, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一本書成本為$80，盈利百分率為25%，求售價。", answer: 100, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一件衣服成本為$160，盈利百分率為30%，求售價。", answer: 208, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一部手機成本為$800，盈利百分率為15%，求售價。", answer: 920, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一雙鞋成本為$250，盈利百分率為40%，求售價。", answer: 350, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一個背包成本為$120，盈利百分率為35%，求售價。", answer: 162, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一支筆成本為$6，盈利百分率為50%，求售價。", answer: 9, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一台電腦成本為$4000，盈利百分率為18%，求售價。", answer: 4720, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一件玩具成本為$45，盈利百分率為60%，求售價。", answer: 72, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" },
+                { question: "一個杯子成本為$30，盈利百分率為20%，求售價。", answer: 36, unit: "$", hint: "使用公式：售價 = 成本 × (1+盈利百分率)" }
+            ],
+            // 公式5: 虧蝕 = 成本 - 售價
+            [
+                { question: "一件商品成本為$300，售價為$250，求虧蝕。", answer: 50, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一本書成本為$100，售價為$80，求虧蝕。", answer: 20, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一件衣服成本為$200，售價為$160，求虧蝕。", answer: 40, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一部手機成本為$800，售價為$720，求虧蝕。", answer: 80, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一雙鞋成本為$400，售價為$320，求虧蝕。", answer: 80, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一個背包成本為$150，售價為$120，求虧蝕。", answer: 30, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一支筆成本為$10，售價為$8，求虧蝕。", answer: 2, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一台電腦成本為$6000，售價為$5400，求虧蝕。", answer: 600, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一件玩具成本為$60，售價為$45，求虧蝕。", answer: 15, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" },
+                { question: "一個杯子成本為$25，售價為$20，求虧蝕。", answer: 5, unit: "$", hint: "使用公式：虧蝕 = 成本 - 售價" }
+            ],
+            // 公式6: 虧蝕百分率 = 虧蝕/成本 × 100%
+            [
+                { question: "一件商品成本為$400，虧蝕為$80，求虧蝕百分率。", answer: 20, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一本書成本為$120，虧蝕為$30，求虧蝕百分率。", answer: 25, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一件衣服成本為$200，虧蝕為$50，求虧蝕百分率。", answer: 25, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一部手機成本為$800，虧蝕為$120，求虧蝕百分率。", answer: 15, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一雙鞋成本為$300，虧蝕為$90，求虧蝕百分率。", answer: 30, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一個背包成本為$150，虧蝕為$45，求虧蝕百分率。", answer: 30, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一支筆成本為$10，虧蝕為$1，求虧蝕百分率。", answer: 10, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一台電腦成本為$5000，虧蝕為$750，求虧蝕百分率。", answer: 15, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一件玩具成本為$80，虧蝕為$16，求虧蝕百分率。", answer: 20, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" },
+                { question: "一個杯子成本為$40，虧蝕為$8，求虧蝕百分率。", answer: 20, unit: "%", hint: "使用公式：虧蝕百分率 = 虧蝕/成本 × 100%" }
+            ],
+            // 公式7: 虧蝕 = 成本 × 虧蝕百分率
+            [
+                { question: "一件商品成本為$600，虧蝕百分率為10%，求虧蝕。", answer: 60, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一本書成本為$80，虧蝕百分率為15%，求虧蝕。", answer: 12, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一件衣服成本為$200，虧蝕百分率為20%，求虧蝕。", answer: 40, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一部手機成本為$1000，虧蝕百分率為12%，求虧蝕。", answer: 120, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一雙鞋成本為$300，虧蝕百分率為25%，求虧蝕。", answer: 75, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一個背包成本為$120，虧蝕百分率為30%，求虧蝕。", answer: 36, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一支筆成本為$8，虧蝕百分率為25%，求虧蝕。", answer: 2, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一台電腦成本為$4000，虧蝕百分率為18%，求虧蝕。", answer: 720, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一件玩具成本為$50，虧蝕百分率為40%，求虧蝕。", answer: 20, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" },
+                { question: "一個杯子成本為$30，虧蝕百分率為20%，求虧蝕。", answer: 6, unit: "$", hint: "使用公式：虧蝕 = 成本 × 虧蝕百分率" }
+            ],
+            // 公式8: 售價 = 成本 × (1-虧蝕百分率)
+            [
+                { question: "一件商品成本為$800，虧蝕百分率為25%，求售價。", answer: 600, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一本書成本為$100，虧蝕百分率為20%，求售價。", answer: 80, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一件衣服成本為$160，虧蝕百分率為15%，求售價。", answer: 136, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一部手機成本為$1200，虧蝕百分率為10%，求售價。", answer: 1080, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一雙鞋成本為$400，虧蝕百分率為30%，求售價。", answer: 280, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一個背包成本為$150，虧蝕百分率為40%，求售價。", answer: 90, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一支筆成本為$12，虧蝕百分率為25%，求售價。", answer: 9, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一台電腦成本為$5000，虧蝕百分率為18%，求售價。", answer: 4100, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一件玩具成本為$60，虧蝕百分率為35%，求售價。", answer: 39, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" },
+                { question: "一個杯子成本為$40，虧蝕百分率為15%，求售價。", answer: 34, unit: "$", hint: "使用公式：售價 = 成本 × (1-虧蝕百分率)" }
+            ],
+            // 公式9: 折扣 = 標價 - 售價
+            [
+                { question: "一件商品標價為$500，售價為$400，求折扣。", answer: 100, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一本書標價為$120，售價為$96，求折扣。", answer: 24, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一件衣服標價為$300，售價為$240，求折扣。", answer: 60, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一部手機標價為$1000，售價為$850，求折扣。", answer: 150, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一雙鞋標價為$400，售價為$320，求折扣。", answer: 80, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一個背包標價為$200，售價為$160，求折扣。", answer: 40, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一支筆標價為$15，售價為$12，求折扣。", answer: 3, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一台電腦標價為$8000，售價為$7200，求折扣。", answer: 800, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一件玩具標價為$80，售價為$64，求折扣。", answer: 16, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" },
+                { question: "一個杯子標價為$50，售價為$40，求折扣。", answer: 10, unit: "$", hint: "使用公式：折扣 = 標價 - 售價" }
+            ],
+            // 公式10: 折扣百分率 = 折扣/標價 × 100%
+            [
+                { question: "一件商品標價為$600，折扣為$120，求折扣百分率。", answer: 20, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一本書標價為$100，折扣為$25，求折扣百分率。", answer: 25, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一件衣服標價為$200，折扣為$60，求折扣百分率。", answer: 30, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一部手機標價為$800，折扣為$120，求折扣百分率。", answer: 15, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一雙鞋標價為$400，折扣為$100，求折扣百分率。", answer: 25, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一個背包標價為$150，折扣為$45，求折扣百分率。", answer: 30, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一支筆標價為$20，折扣為$4，求折扣百分率。", answer: 20, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一台電腦標價為$6000，折扣為$900，求折扣百分率。", answer: 15, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一件玩具標價為$60，折扣為$18，求折扣百分率。", answer: 30, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" },
+                { question: "一個杯子標價為$40，折扣為$8，求折扣百分率。", answer: 20, unit: "%", hint: "使用公式：折扣百分率 = 折扣/標價 × 100%" }
+            ],
+            // 公式11: 折扣 = 標價 × 折扣百分率
+            [
+                { question: "一件商品標價為$800，折扣百分率為15%，求折扣。", answer: 120, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一本書標價為$120，折扣百分率為20%，求折扣。", answer: 24, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一件衣服標價為$300，折扣百分率為25%，求折扣。", answer: 75, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一部手機標價為$1000，折扣百分率為18%，求折扣。", answer: 180, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一雙鞋標價為$400，折扣百分率為30%，求折扣。", answer: 120, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一個背包標價為$200，折扣百分率為35%，求折扣。", answer: 70, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一支筆標價為$16，折扣百分率為25%，求折扣。", answer: 4, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一台電腦標價為$5000，折扣百分率為22%，求折扣。", answer: 1100, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一件玩具標價為$80，折扣百分率為40%，求折扣。", answer: 32, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" },
+                { question: "一個杯子標價為$50，折扣百分率為20%，求折扣。", answer: 10, unit: "$", hint: "使用公式：折扣 = 標價 × 折扣百分率" }
+            ],
+            // 公式12: 售價 = 標價 × (1-折扣百分率)
+            [
+                { question: "一件商品標價為$1000，折扣百分率為30%，求售價。", answer: 700, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一本書標價為$80，折扣百分率為25%，求售價。", answer: 60, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一件衣服標價為$200，折扣百分率為20%，求售價。", answer: 160, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一部手機標價為$1200，折扣百分率為15%，求售價。", answer: 1020, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一雙鞋標價為$500，折扣百分率為40%，求售價。", answer: 300, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一個背包標價為$150，折扣百分率為30%，求售價。", answer: 105, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一支筆標價為$12，折扣百分率為25%，求售價。", answer: 9, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一台電腦標價為$6000，折扣百分率為18%，求售價。", answer: 4920, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一件玩具標價為$60，折扣百分率為35%，求售價。", answer: 39, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" },
+                { question: "一個杯子標價為$40，折扣百分率為20%，求售價。", answer: 32, unit: "$", hint: "使用公式：售價 = 標價 × (1-折扣百分率)" }
+            ]
+        ];
+
+        // 程度二題庫 - 10種題型，每種4道題目
+        const level2QuestionBank = [
+            // 題型1: 已知成本和售價，求盈利百分率
+            [
+                { question: "小華用$1200買了一部平板電腦後，再以$1860售出。求盈利百分率。", answer: 55, unit: "%", hint: "使用公式：盈利百分率 = (售價 - 成本) ÷ 成本 × 100%" },
+                { question: "小李用$600買了一雙運動鞋後，再以$900售出。求盈利百分率。", answer: 50, unit: "%", hint: "使用公式：盈利百分率 = (售價 - 成本) ÷ 成本 × 100%" },
+                { question: "小王用$1500買了一件外套後，再以$2325售出。求盈利百分率。", answer: 55, unit: "%", hint: "使用公式：盈利百分率 = (售價 - 成本) ÷ 成本 × 100%" },
+                { question: "小張用$800買了一個背包後，再以$1160售出。求盈利百分率。", answer: 45, unit: "%", hint: "使用公式：盈利百分率 = (售價 - 成本) ÷ 成本 × 100%" }
+            ],
+            // 題型2: 已知成本和售價，求虧蝕百分率
+            [
+                { question: "小陳用$120買了一本教科書，然後以$78轉售給同學。求小陳的虧蝕百分率。", answer: 35, unit: "%", hint: "使用公式：虧蝕百分率 = (成本 - 售價) ÷ 成本 × 100%" },
+                { question: "小林用$200買了一件衣服，然後以$130轉售。求小林的虧蝕百分率。", answer: 35, unit: "%", hint: "使用公式：虧蝕百分率 = (成本 - 售價) ÷ 成本 × 100%" },
+                { question: "小黃用$150買了一雙鞋，然後以$97.5轉售。求小黃的虧蝕百分率。", answer: 35, unit: "%", hint: "使用公式：虧蝕百分率 = (成本 - 售價) ÷ 成本 × 100%" },
+                { question: "小劉用$300買了一個手提包，然後以$195轉售。求小劉的虧蝕百分率。", answer: 35, unit: "%", hint: "使用公式：虧蝕百分率 = (成本 - 售價) ÷ 成本 × 100%" }
+            ],
+            // 題型3: 已知成本和盈利百分率，求盈利和售價（兩部分題目）
+            [
+                { 
+                    question: "志明以$2400買了一台電腦，然後以25%的盈利百分率售出該電腦。", 
+                    parts: ["(a) 求志明所得的盈利。", "(b) 求志明出售該電腦的售價。"],
+                    answer: [600, 3000], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 盈利 = 成本 × 盈利百分率，(b) 售價 = 成本 + 盈利" 
+                },
+                { 
+                    question: "美玲以$1600買了一個名牌手袋，然後以30%的盈利百分率售出該手袋。", 
+                    parts: ["(a) 求美玲所得的盈利。", "(b) 求美玲出售該手袋的售價。"],
+                    answer: [480, 2080], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 盈利 = 成本 × 盈利百分率，(b) 售價 = 成本 + 盈利" 
+                },
+                { 
+                    question: "家豪以$5000買了一部相機，然後以18%的盈利百分率售出該相機。", 
+                    parts: ["(a) 求家豪所得的盈利。", "(b) 求家豪出售該相機的售價。"],
+                    answer: [900, 5900], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 盈利 = 成本 × 盈利百分率，(b) 售價 = 成本 + 盈利" 
+                },
+                { 
+                    question: "淑儀以$2000買了一支手錶，然後以15%的盈利百分率售出該手錶。", 
+                    parts: ["(a) 求淑儀所得的盈利。", "(b) 求淑儀出售該手錶的售價。"],
+                    answer: [300, 2300], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 盈利 = 成本 × 盈利百分率，(b) 售價 = 成本 + 盈利" 
+                }
+            ],
+            // 題型4: 已知成本和虧蝕百分率，求售價
+            [
+                { question: "一台洗衣機的成本是$1200，現以15%的虧蝕百分率出售。求該洗衣機售價。", answer: 1020, unit: "$", hint: "使用公式：售價 = 成本 × (1 - 虧蝕百分率)" },
+                { question: "一部雪櫃的成本是$2500，現以8%的虧蝕百分率出售。求該雪櫃售價。", answer: 2300, unit: "$", hint: "使用公式：售價 = 成本 × (1 - 虧蝕百分率)" },
+                { question: "一張沙發的成本是$1800，現以10%的虧蝕百分率出售。求該沙發售價。", answer: 1620, unit: "$", hint: "使用公式：售價 = 成本 × (1 - 虧蝕百分率)" },
+                { question: "一部微波爐的成本是$600，現以18%的虧蝕百分率出售。求該微波爐售價。", answer: 492, unit: "$", hint: "使用公式：售價 = 成本 × (1 - 虧蝕百分率)" }
+            ],
+            // 題型5: 已知售價和虧蝕金額，求虧蝕百分率
+            [
+                { question: "一部電視機以$2088售出，虧蝕為$312。求該電視機的虧蝕百分率。", answer: 13, unit: "%", hint: "先求成本 = 售價 + 虧蝕，再用公式：虧蝕百分率 = 虧蝕 ÷ 成本 × 100%" },
+                { question: "一張餐桌以$1740售出，虧蝕為$260。求該餐桌的虧蝕百分率。", answer: 13, unit: "%", hint: "先求成本 = 售價 + 虧蝕，再用公式：虧蝕百分率 = 虧蝕 ÷ 成本 × 100%" },
+                { question: "一部手機以$1827售出，虧蝕為$273。求該手機的虧蝕百分率。", answer: 13, unit: "%", hint: "先求成本 = 售價 + 虧蝕，再用公式：虧蝕百分率 = 虧蝕 ÷ 成本 × 100%" },
+                { question: "一個書櫃以$1392售出，虧蝕為$208。求該書櫃的虧蝕百分率。", answer: 13, unit: "%", hint: "先求成本 = 售價 + 虧蝕，再用公式：虧蝕百分率 = 虧蝕 ÷ 成本 × 100%" }
+            ],
+            // 題型6: 已知盈利百分率和售價，求盈利
+            [
+                { question: "一部單車以25%的盈利百分率售出，售價為$150。求該單車的盈利。", answer: 30, unit: "$", hint: "設成本為x，則1.25x = 150，求出x後計算盈利" },
+                { question: "一個音響以30%的盈利百分率售出，售價為$260。求該音響的盈利。", answer: 60, unit: "$", hint: "設成本為x，則1.3x = 260，求出x後計算盈利" },
+                { question: "一台電腦以15%的盈利百分率售出，售價為$920。求該電腦的盈利。", answer: 120, unit: "$", hint: "設成本為x，則1.15x = 920，求出x後計算盈利" },
+                { question: "一件珠寶以40%的盈利百分率售出，售價為$280。求該珠寶的盈利。", answer: 80, unit: "$", hint: "設成本為x，則1.4x = 280，求出x後計算盈利" }
+            ],
+            // 題型7: 已知標價和折扣率，求售價
+            [
+                { question: "一本小說的標價為$60，現以三折出售。求該小說的售價。", answer: 18, unit: "$", hint: "使用公式：售價 = 標價 × 折扣率" },
+                { question: "一件衣服標價$120，現以五折出售。求該衣服的售價。", answer: 60, unit: "$", hint: "使用公式：售價 = 標價 × 折扣率" },
+                { question: "一雙鞋標價$200，現以六折出售。求該鞋的售價。", answer: 120, unit: "$", hint: "使用公式：售價 = 標價 × 折扣率" },
+                { question: "一個背包標價$80，現以七折出售。求該背包的售價。", answer: 56, unit: "$", hint: "使用公式：售價 = 標價 × 折扣率" }
+            ],
+            // 題型8: 已知售價和折扣百分率，求標價和節省金額（兩部分題目）
+            [
+                { 
+                    question: "志華以$21.25購買一本書，折扣百分率為15%。", 
+                    parts: ["(a) 求該書的標價。", "(b) 求志華節省了的金額。"],
+                    answer: [25, 3.75], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ (1 - 折扣百分率)，(b) 節省金額 = 標價 - 售價" 
+                },
+                { 
+                    question: "美美以$34購買一件T恤，折扣百分率為15%。", 
+                    parts: ["(a) 求該T恤的標價。", "(b) 求美美節省了的金額。"],
+                    answer: [40, 6], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ (1 - 折扣百分率)，(b) 節省金額 = 標價 - 售價" 
+                },
+                { 
+                    question: "家明以$42.5購買一個水壺，折扣百分率為15%。", 
+                    parts: ["(a) 求該水壺的標價。", "(b) 求家明節省了的金額。"],
+                    answer: [50, 7.5], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ (1 - 折扣百分率)，(b) 節省金額 = 標價 - 售價" 
+                },
+                { 
+                    question: "淑雯以$68購買一雙鞋，折扣百分率為15%。", 
+                    parts: ["(a) 求該鞋的標價。", "(b) 求淑雯節省了的金額。"],
+                    answer: [80, 12], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ (1 - 折扣百分率)，(b) 節省金額 = 標價 - 售價" 
+                }
+            ],
+            // 題型9: 已知折扣率和節省金額，求標價
+            [
+                { question: "志強以八五折購買了一部手機，並節省了$180。求該手機的標價。", answer: 1200, unit: "$", hint: "設標價為x，則節省金額 = x × 折扣百分率" },
+                { question: "美華以九折購買了一台電腦，並節省了$320。求該電腦的標價。", answer: 3200, unit: "$", hint: "設標價為x，則節省金額 = x × 折扣百分率" },
+                { question: "家豪以七五折購買了一件外套，並節省了$125。求該外套的標價。", answer: 500, unit: "$", hint: "設標價為x，則節省金額 = x × 折扣百分率" },
+                { question: "淑儀以八折購買了一個手袋，並節省了$90。求該手袋的標價。", answer: 450, unit: "$", hint: "設標價為x，則節省金額 = x × 折扣百分率" }
+            ],
+            // 題型10: 已知虧蝕百分率和虧蝕金額，求成本
+            [
+                { question: "志明以45%的虧蝕百分率售出一部電腦，虧蝕為$1800。求該電腦的成本。", answer: 4000, unit: "$", hint: "使用公式：成本 = 虧蝕 ÷ 虧蝕百分率" },
+                { question: "美玲以60%的虧蝕百分率售出一件珠寶，虧蝕為$2400。求該珠寶的成本。", answer: 4000, unit: "$", hint: "使用公式：成本 = 虧蝕 ÷ 虧蝕百分率" },
+                { question: "家豪以35%的虧蝕百分率售出一台相機，虧蝕為$1400。求該相機的成本。", answer: 4000, unit: "$", hint: "使用公式：成本 = 虧蝕 ÷ 虧蝕百分率" },
+                { question: "淑儀以40%的虧蝕百分率售出一支手錶，虧蝕為$800。求該手錶的成本。", answer: 2000, unit: "$", hint: "使用公式：成本 = 虧蝕 ÷ 虧蝕百分率" }
+            ]
+        ];
+
+        // 程度三題庫 - 5種題型，每種4道題目
+        const level3QuestionBank = [
+            // 題型1: 已知成本和盈利百分率，求售價和標價（兩部分題目）
+            [
+                { 
+                    question: "某手機的成本為 $800。現售出該手機且盈利百分率為 25%。", 
+                    parts: ["(a) 求該手機的售價。", "(b) 若該手機以其標價八折售出，求該手機的標價。"],
+                    answer: [1000, 1250], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 售價 = 成本 × (1 + 盈利百分率)，(b) 標價 = 售價 ÷ 折扣率" 
+                },
+                { 
+                    question: "某電腦的成本為 $1200。現售出該電腦且盈利百分率為 15%。(答案須準確至二位小數)", 
+                    parts: ["(a) 求該電腦的售價。", "(b) 若該電腦以其標價九折售出，求該電腦的標價。"],
+                    answer: [1380, 1533.33], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 售價 = 成本 × (1 + 盈利百分率)，(b) 標價 = 售價 ÷ 折扣率" 
+                },
+                { 
+                    question: "某相機的成本為 $1500。現售出該相機且盈利百分率為 30%。", 
+                    parts: ["(a) 求該相機的售價。", "(b) 若該相機以其標價六五折售出，求該相機的標價。"],
+                    answer: [1950, 3000], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 售價 = 成本 × (1 + 盈利百分率)，(b) 標價 = 售價 ÷ 折扣率" 
+                },
+                { 
+                    question: "某手錶的成本為 $600。現售出該手錶且盈利百分率為 40%。", 
+                    parts: ["(a) 求該手錶的售價。", "(b) 若該手錶以其標價七折售出，求該手錶的標價。"],
+                    answer: [840, 1200], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 售價 = 成本 × (1 + 盈利百分率)，(b) 標價 = 售價 ÷ 折扣率" 
+                }
+            ],
+            // 題型2: 已知標價比成本高的百分率、折扣率和虧蝕金額，求標價
+            [
+                { question: "某電視的標價較其成本高 25%。該電視以其標價七折售出其虧蝕 $150。求該電視的標價。", answer: 1500, unit: "$", hint: "設成本為C，標價為1.25C，售價為0.7×1.25C，虧蝕 = C - 售價" },
+                { question: "某沙發的標價較其成本高 20%。該沙發以其標價五折售出其虧蝕 $200。求該沙發的標價。", answer: 600, unit: "$", hint: "設成本為C，標價為1.2C，售價為0.5×1.2C，虧蝕 = C - 售價" },
+                { question: "某冰箱的標價較其成本高 20%。該冰箱以其標價八折售出其虧蝕 $50。求該冰箱的標價。", answer: 1500, unit: "$", hint: "設成本為C，標價為1.2C，售價為0.8×1.2C，虧蝕 = C - 售價" },
+                { question: "某洗衣機的標價較其成本高 10%。該洗衣機以其標價七折售出其虧蝕 $230。求該洗衣機的標價。", answer: 1100, unit: "$", hint: "設成本為C，標價為1.1C，售價為0.7×1.1C，虧蝕 = C - 售價" }
+            ],
+            // 題型3: 已知折扣率和售價，求標價和成本（兩部分題目）
+            [
+                { 
+                    question: "某背包以其標價八折售出。該背包的售價為 $480。", 
+                    parts: ["(a) 求該背包的標價。", "(b) 售出該背包後，盈利百分率為 20%。求該背包的成本。"],
+                    answer: [600, 400], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ 折扣率，(b) 成本 = 售價 ÷ (1 + 盈利百分率)" 
+                },
+                { 
+                    question: "某鞋子以其標價九折售出。該鞋子的售價為 $540。", 
+                    parts: ["(a) 求該鞋子的標價。", "(b) 售出該鞋子後，盈利百分率為 25%。求該鞋子的成本。"],
+                    answer: [600, 432], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ 折扣率，(b) 成本 = 售價 ÷ (1 + 盈利百分率)" 
+                },
+                { 
+                    question: "某外套以其標價六折售出。該外套的售價為 $360。", 
+                    parts: ["(a) 求該外套的標價。", "(b) 售出該外套後，盈利百分率為 12.5%。求該外套的成本。"],
+                    answer: [600, 320], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ 折扣率，(b) 成本 = 售價 ÷ (1 + 盈利百分率)" 
+                },
+                { 
+                    question: "某帽子以其標價八五折售出。該帽子的售價為 $255。(答案須準確至二位小數)", 
+                    parts: ["(a) 求該帽子的標價。", "(b) 售出該帽子後，盈利百分率為 30%。求該帽子的成本。"],
+                    answer: [300, 196.15], 
+                    unit: ["$", "$"], 
+                    hint: "(a) 標價 = 售價 ÷ 折扣率，(b) 成本 = 售價 ÷ (1 + 盈利百分率)" 
+                }
+            ],
+            // 題型4: 已知標價比成本高的金額、折扣率和盈利百分率，求標價
+            [
+                { question: "某T恤的標價較其成本高 $60。該T恤以其標價八折售出。售出該T恤後，盈利百分率為 20%。求該T恤的標價。", answer: 180, unit: "$", hint: "設標價為P，成本為P-60，售價為0.8P，盈利百分率 = (售價-成本)/成本" },
+                { question: "某褲子的標價較其成本高 $45。該褲子以其標價七五折售出。售出該褲子後，盈利百分率為 25%。求該褲子的標價。", answer: 112.5, unit: "$", hint: "設標價為P，成本為P-45，售價為0.75P，盈利百分率 = (售價-成本)/成本" },
+                { question: "某裙子的標價較其成本高 $90。該裙子以其標價八五折售出。售出該裙子後，盈利百分率為 36%。求該裙子的標價。", answer: 240, unit: "$", hint: "設標價為P，成本為P-90，售價為0.85P，盈利百分率 = (售價-成本)/成本" },
+                { question: "某夾克的標價較其成本高 $80。該夾克以其標價九折售出。售出該夾克後，盈利百分率為 35%。求該夾克的標價。", answer: 240, unit: "$", hint: "設標價為P，成本為P-80，售價為0.9P，盈利百分率 = (售價-成本)/成本" }
+            ],
+            // 題型5: 已知折扣率、盈利金額和盈利百分率，求標價
+            [
+                { question: "某音響以其標價八折出售。售出該音響後，盈利為 $96 且盈利百分率為 24%。求該音響的標價。", answer: 620, unit: "$", hint: "由盈利和盈利百分率求成本，再由折扣率和成本求標價" },
+                { question: "某檯燈以其標價六五折出售。售出該檯燈後，盈利為 $52 且盈利百分率為 20%。求該檯燈的標價。", answer: 480, unit: "$", hint: "由盈利和盈利百分率求成本，再由折扣率和成本求標價" },
+                { question: "某書桌以其標價七五折出售。售出該書桌後，盈利為 $135 且盈利百分率為 30%。求該書桌的標價。", answer: 780, unit: "$", hint: "由盈利和盈利百分率求成本，再由折扣率和成本求標價" },
+                { question: "某椅子以其標價九折出售。售出該椅子後，盈利為 $54 且盈利百分率為 20%。求該椅子的標價。", answer: 360, unit: "$", hint: "由盈利和盈利百分率求成本，再由折扣率和成本求標價" }
+            ]
+        ];
+
+        // 初始化
+        function init() {
+            loadScores();
+        }
+
+        // 載入分數
+        function loadScores() {
+            const saved = localStorage.getItem('mathQuizScores');
+            if (saved) {
+                levelScores = JSON.parse(saved);
+                updateScoreDisplay();
+            }
+        }
+
+        // 儲存分數
+        function saveScores() {
+            localStorage.setItem('mathQuizScores', JSON.stringify(levelScores));
+        }
+
+
+
+        // 更新分數顯示
+        function updateScoreDisplay() {
+            for (let level = 1; level <= 3; level++) {
+                const scoreElement = document.getElementById(`level${level}Score`);
+                if (levelScores[level] > 0) {
+                    const totalQuestions = level === 1 ? 12 : (level === 2 ? 6 : 4);
+                    const percentage = Math.round((levelScores[level] / totalQuestions) * 100);
+                    scoreElement.querySelector('span').textContent = `${levelScores[level]}/${totalQuestions} (${percentage}%)`;
+                    scoreElement.classList.remove('hidden');
+                }
+            }
+        }
+
+        // 隨機選擇題目
+        function selectRandomQuestions(questionBank, count) {
+            const selected = [];
+            if (questionBank.length === 10 && count === 6) {
+                // 程度二：從10種題型中隨機選6種
+                const selectedTypes = [];
+                while (selectedTypes.length < 6) {
+                    const randomType = Math.floor(Math.random() * 10);
+                    if (!selectedTypes.includes(randomType)) {
+                        selectedTypes.push(randomType);
+                    }
+                }
+                for (let i = 0; i < 6; i++) {
+                    const typeIndex = selectedTypes[i];
+                    const randomIndex = Math.floor(Math.random() * questionBank[typeIndex].length);
+                    selected.push(questionBank[typeIndex][randomIndex]);
+                }
+            } else if (questionBank.length === 5 && count === 4) {
+                // 程度三：從5種題型中隨機選4種
+                const selectedTypes = [];
+                while (selectedTypes.length < 4) {
+                    const randomType = Math.floor(Math.random() * 5);
+                    if (!selectedTypes.includes(randomType)) {
+                        selectedTypes.push(randomType);
+                    }
+                }
+                for (let i = 0; i < 4; i++) {
+                    const typeIndex = selectedTypes[i];
+                    const randomIndex = Math.floor(Math.random() * questionBank[typeIndex].length);
+                    selected.push(questionBank[typeIndex][randomIndex]);
+                }
+            } else {
+                // 程度一：原有邏輯
+                for (let i = 0; i < count; i++) {
+                    const randomIndex = Math.floor(Math.random() * questionBank[i].length);
+                    selected.push(questionBank[i][randomIndex]);
+                }
+            }
+            return selected;
+        }
+
+
+
+        // 開始測驗
+        function startLevel(level) {
+            currentLevel = level;
+            currentQuestion = 0;
+            score = 0;
+            
+            // 設定題目
+            if (level === 1) {
+                questions = selectRandomQuestions(level1QuestionBank, 12);
+                document.getElementById('quizTitle').textContent = '程度一 - 初階測驗';
+                document.getElementById('totalQuestions').textContent = '12';
+            } else if (level === 2) {
+                questions = selectRandomQuestions(level2QuestionBank, 6);
+                document.getElementById('quizTitle').textContent = '程度二 - 中階測驗';
+                document.getElementById('totalQuestions').textContent = '6';
+            } else {
+                questions = selectRandomQuestions(level3QuestionBank, 4);
+                document.getElementById('quizTitle').textContent = '程度三 - 進階測驗';
+                document.getElementById('totalQuestions').textContent = '4';
+            }
+
+            // 隱藏主選單，顯示測驗介面
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('quizInterface').classList.remove('hidden');
+            
+            showQuestion();
+        }
+
+        // 顯示題目
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+            
+            // 處理兩部分題目
+            if (question.parts) {
+                let questionHTML = question.question + '<br><br>';
+                questionHTML += question.parts[0] + '<br>';
+                questionHTML += question.parts[1];
+                document.getElementById('questionText').innerHTML = questionHTML;
+                
+                // 創建兩個輸入框
+                const answerContainer = document.querySelector('.space-y-3');
+                const hintButton = currentLevel === 3 ? '' : '<button onclick="showHint()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium">💡 提示</button>';
+                answerContainer.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <label class="w-8 text-sm font-medium">(a)</label>
+                        <input type="text" id="answerInput1" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-lg" placeholder="請在此輸入答案">
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="w-8 text-sm font-medium">(b)</label>
+                        <input type="text" id="answerInput2" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-lg" placeholder="請在此輸入答案">
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="submitAnswer()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium">提交答案</button>
+                        ${hintButton}
+                    </div>
+                `;
+                document.getElementById('answerInput1').focus();
+            } else {
+                document.getElementById('questionText').textContent = question.question;
+                
+                // 恢復單個輸入框
+                const answerContainer = document.querySelector('.space-y-3');
+                const hintButton = currentLevel === 3 ? '' : '<button onclick="showHint()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium">💡 提示</button>';
+                answerContainer.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="answerInput" class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-lg" placeholder="請在此輸入答案">
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="submitAnswer()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium">提交答案</button>
+                        ${hintButton}
+                    </div>
+                `;
+                document.getElementById('answerInput').focus();
+            }
+            
+            document.getElementById('currentScore').textContent = score;
+            
+            // 更新進度條
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // 隱藏提示和結果
+            document.getElementById('hintSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        // 顯示提示
+        function showHint() {
+            const question = questions[currentQuestion];
+            document.getElementById('hintText').textContent = question.hint;
+            document.getElementById('hintSection').classList.remove('hidden');
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            // 檢查是否已經提交過答案
+            if (!document.getElementById('resultSection').classList.contains('hidden')) {
+                return; // 已經提交過，直接返回
+            }
+            
+            const question = questions[currentQuestion];
+            const resultSection = document.getElementById('resultSection');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (question.parts) {
+                // 兩部分題目
+                const userInput1 = document.getElementById('answerInput1').value.trim();
+                const userInput2 = document.getElementById('answerInput2').value.trim();
+                
+                if (!userInput1 || !userInput2) {
+                    alert('請輸入兩部分的答案');
+                    return;
+                }
+                
+                // 解析用戶輸入
+                let userAnswer1 = parseFloat(userInput1.replace(/[$%]/g, ''));
+                let userAnswer2 = parseFloat(userInput2.replace(/[$%]/g, ''));
+                
+                if (isNaN(userAnswer1) || isNaN(userAnswer2)) {
+                    alert('請輸入有效的數字');
+                    return;
+                }
+                
+                const correctAnswer1 = question.answer[0];
+                const correctAnswer2 = question.answer[1];
+                const correctUnit1 = question.unit[0];
+                const correctUnit2 = question.unit[1];
+                
+                const isCorrect1 = Math.abs(userAnswer1 - correctAnswer1) < 0.005;
+                const isCorrect2 = Math.abs(userAnswer2 - correctAnswer2) < 0.005;
+                const isAllCorrect = isCorrect1 && isCorrect2;
+                
+                const formattedCorrectAnswer1 = correctUnit1 === '$' ? `${correctUnit1}${correctAnswer1}` : `${correctAnswer1}${correctUnit1}`;
+                const formattedCorrectAnswer2 = correctUnit2 === '$' ? `${correctUnit2}${correctAnswer2}` : `${correctAnswer2}${correctUnit2}`;
+                
+                if (isAllCorrect) {
+                    score++;
+                    resultMessage.className = 'p-4 rounded-lg mb-4 bg-green-100 border border-green-300 text-green-800 pulse-correct';
+                    resultMessage.innerHTML = `<div class="flex items-center"><span class="text-2xl mr-2">✅</span><div><strong>正確！</strong><br>(a) ${formattedCorrectAnswer1}<br>(b) ${formattedCorrectAnswer2}</div></div>`;
+                } else {
+                    resultMessage.className = 'p-4 rounded-lg mb-4 bg-red-100 border border-red-300 text-red-800 shake-wrong';
+                    let errorMsg = '<div class="flex items-center"><span class="text-2xl mr-2">❌</span><div><strong>錯誤！</strong><br>';
+                    errorMsg += `正確答案：<br>(a) ${formattedCorrectAnswer1}<br>(b) ${formattedCorrectAnswer2}<br>`;
+                    errorMsg += `你的答案：<br>(a) ${userAnswer1}<br>(b) ${userAnswer2}</div></div>`;
+                    resultMessage.innerHTML = errorMsg;
+                }
+                
+                // 禁用輸入框
+                document.getElementById('answerInput1').disabled = true;
+                document.getElementById('answerInput2').disabled = true;
+            } else {
+                // 單部分題目
+                const userInput = document.getElementById('answerInput').value.trim();
+                
+                if (!userInput) {
+                    alert('請輸入答案');
+                    return;
+                }
+                
+                let userAnswer = parseFloat(userInput.replace(/[$%]/g, ''));
+                
+                if (isNaN(userAnswer)) {
+                    alert('請輸入有效的數字');
+                    return;
+                }
+                
+                const correctAnswer = question.answer;
+                const correctUnit = question.unit;
+                const isCorrect = Math.abs(userAnswer - correctAnswer) < 0.005;
+                const formattedCorrectAnswer = correctUnit === '$' ? `${correctUnit}${correctAnswer}` : `${correctAnswer}${correctUnit}`;
+                
+                if (isCorrect) {
+                    score++;
+                    resultMessage.className = 'p-4 rounded-lg mb-4 bg-green-100 border border-green-300 text-green-800 pulse-correct';
+                    resultMessage.innerHTML = `<div class="flex items-center"><span class="text-2xl mr-2">✅</span><div><strong>正確！</strong><br>答案是 ${formattedCorrectAnswer}</div></div>`;
+                } else {
+                    resultMessage.className = 'p-4 rounded-lg mb-4 bg-red-100 border border-red-300 text-red-800 shake-wrong';
+                    resultMessage.innerHTML = `<div class="flex items-center"><span class="text-2xl mr-2">❌</span><div><strong>錯誤！</strong><br>正確答案是 ${formattedCorrectAnswer}<br>你的答案是 ${userAnswer}</div></div>`;
+                }
+                
+                // 禁用輸入框
+                document.getElementById('answerInput').disabled = true;
+            }
+            
+            resultSection.classList.remove('hidden');
+            document.getElementById('currentScore').textContent = score;
+            
+            // 禁用提交按鈕
+            document.querySelector('button[onclick="submitAnswer()"]').disabled = true;
+            document.querySelector('button[onclick="submitAnswer()"]').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        // 下一題
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion >= questions.length) {
+                showResult();
+            } else {
+                showQuestion();
+            }
+        }
+
+        // 顯示結果
+        function showResult() {
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            // 更新最佳成績
+            if (score > levelScores[currentLevel]) {
+                levelScores[currentLevel] = score;
+                saveScores();
+            }
+            
+            document.getElementById('quizInterface').classList.add('hidden');
+            document.getElementById('resultPage').classList.remove('hidden');
+            
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultStats = document.getElementById('resultStats');
+            const passCodeSection = document.getElementById('passCodeSection');
+            
+            resultStats.innerHTML = `
+                <div class="mb-2">總題數：${questions.length}</div>
+                <div class="mb-2">答對：${score} 題</div>
+                <div class="mb-2">答錯：${questions.length - score} 題</div>
+                <div class="text-2xl font-bold">得分率：${percentage}%</div>
+            `;
+            
+            // 根據結果顯示不同內容
+            if (percentage === 100) {
+                resultIcon.textContent = '🎉';
+                resultTitle.textContent = '完美！';
+                resultTitle.className = 'text-3xl font-bold mb-4 text-green-600';
+            } else if (percentage >= 80) {
+                resultIcon.textContent = '🌟';
+                resultTitle.textContent = '優秀！';
+                resultTitle.className = 'text-3xl font-bold mb-4 text-blue-600';
+            } else if (percentage >= 70) {
+                resultIcon.textContent = '👍';
+                resultTitle.textContent = '良好！';
+                resultTitle.className = 'text-3xl font-bold mb-4 text-green-600';
+            } else if (percentage >= 50) {
+                resultIcon.textContent = '📚';
+                resultTitle.textContent = '需要加強';
+                resultTitle.className = 'text-3xl font-bold mb-4 text-yellow-600';
+            } else {
+                resultIcon.textContent = '💪';
+                resultTitle.textContent = '繼續努力！';
+                resultTitle.className = 'text-3xl font-bold mb-4 text-red-600';
+            }
+        }
+
+        // 返回主選單
+        function backToMenu() {
+            document.getElementById('quizInterface').classList.add('hidden');
+            document.getElementById('resultPage').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            updateScoreDisplay();
+        }
+
+        // 鍵盤事件
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (!document.getElementById('quizInterface').classList.contains('hidden')) {
+                    if (!document.getElementById('resultSection').classList.contains('hidden')) {
+                        nextQuestion();
+                    } else {
+                        submitAnswer();
+                    }
+                }
+            }
+        });
+
+        // 初始化應用
+        init();
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c575ee4341684ea',t:'MTc2OTY3NTQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>因式分解測驗 (HKDSE)</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif:wght@400;700&display=swap');
+        
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #8e44ad;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --correct-color: #27ae60;
+            --wrong-color: #e74c3c;
+            --key-bg: #ffffff;
+            --key-shadow: #9ca3af;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f9f9f9;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239b59b6' fill-opacity='0.05'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            padding-bottom: 50px;
+        }
+        
+        .question-card, .example-card {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--secondary-color);
+            background-color: white;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%238e44ad' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .question-card:hover, .example-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            background-color: #8e44ad;
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 140, 141, 0.4);
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #bdc3c7;
+            border-radius: 0.375rem;
+            font-family: 'Noto Serif', serif;
+            background-color: white;
+            font-size: 1.25rem; /* Larger font for easier reading */
+            transition: all 0.3s;
+            cursor: default; /* Changed cursor since it's button driven */
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        
+        .answer-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.25);
+            outline: none;
+            background-color: #fbfbfb;
+        }
+        
+        .answer-input::placeholder {
+            color: #95a5a6;
+            opacity: 1;
+            font-size: 1rem;
+        }
+        
+        .answer-preview {
+            min-height: 50px;
+            border: 2px solid #bdc3c7;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            background-color: #f8f9fa;
+            position: relative;
+            font-family: 'Noto Serif', serif;
+            font-size: 1.25rem;
+        }
+        
+        .preview-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #bdc3c7;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0 0.25rem 0 0.25rem;
+        }
+        
+        .start-screen {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 100;
+        }
+        
+        .start-screen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M50 0l10 20H40L50 0zm0 100l10-20H40l10 20zM0 50l20 10V40L0 50zm100 0l-20 10V40l20 10zM10 0l10 20H0L10 0zm10 100l10-20H0l10 20zM90 0l10 20H80L90 0zm10 100l10-20H80l10 20z'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .math-symbols {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .math-symbol {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.2);
+            font-family: 'Noto Serif', serif;
+            font-weight: bold;
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        .start-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .start-btn {
+            background-color: white;
+            color: var(--secondary-color);
+            font-weight: bold;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            margin: 0.5rem;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .start-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .start-btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .start-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .mjx-chtml {
+            display: inline-block !important;
+        }
+        
+        .hint-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border-radius: 0 0.375rem 0.375rem 0;
+            position: relative;
+        }
+        
+        .hint-box::before {
+            content: "💡";
+            position: absolute;
+            left: -12px;
+            top: -12px;
+            background-color: var(--secondary-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .question-nav-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 2px solid #bdc3c7;
+            background-color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-nav-btn:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question-nav-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .question-nav-btn.answered {
+            background-color: #e8daef; /* Light purple */
+            border-color: var(--secondary-color);
+        }
+        
+        .question-nav-btn.active.answered {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .question-title {
+            font-family: 'Noto Serif', serif;
+            color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .question-title::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--secondary-color);
+        }
+        
+        .nav-buttons {
+            position: relative;
+        }
+        
+        .nav-buttons::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(142, 68, 173, 0.5), transparent);
+        }
+        
+        .result-card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-header {
+            padding: 1rem;
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .result-body {
+            padding: 1.5rem;
+            background-color: white;
+            border: 1px solid #eee;
+            border-top: none;
+        }
+        
+        .part-result {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .part-result:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .result-answer {
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .status-correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-wrong {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-display::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M50 0l10 20H40L50 0zm0 100l10-20H40l10 20zM0 50l20 10V40L0 50zm100 0l-20 10V40l20 10zM10 0l10 20H0L10 0zm10 100l10-20H0l10 20zM90 0l10 20H80L90 0zm10 100l10-20H80l10 20z'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .score-number {
+            font-size: 3rem;
+            font-weight: bold;
+            font-family: 'Noto Serif', serif;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .retry-btn {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .retry-btn:hover {
+            background-color: #1a2530;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+        }
+        
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+
+        .step-note {
+            font-size: 0.8rem;
+            color: #d35400; /* Orange color for notes */
+            background-color: #fce5cd;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Inline Keyboard Styles */
+        .inline-keyboard {
+            background-color: #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border: 1px solid #d1d5db;
+        }
+
+        .keyboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: space-between;
+        }
+
+        .key-btn {
+            background-color: var(--key-bg);
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 0 0 var(--key-shadow);
+            color: #1f2937;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem; /* Larger font size */
+            padding: 0.75rem 0; /* Larger click area */
+            flex: 1;
+            min-width: 0; 
+            min-height: 48px; /* Minimum height for touch targets */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+            transition: all 0.1s;
+        }
+
+        .key-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+            background-color: #f3f4f6;
+        }
+
+        .key-btn.variable {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border-color: #bfdbfe;
+            box-shadow: 0 2px 0 0 #60a5fa;
+        }
+        
+        .key-btn.operator {
+            background-color: #fff7ed;
+            color: #ea580c;
+            border-color: #fed7aa;
+            box-shadow: 0 2px 0 0 #fb923c;
+        }
+
+        .key-btn.number {
+            font-weight: 500;
+        }
+
+        .key-btn.action {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+            box-shadow: 0 2px 0 0 #f87171;
+            flex: 1.5; /* Wider backspace */
+        }
+        
+        /* Highlight focused input (even though read-only) */
+        .input-active {
+            border-color: var(--secondary-color) !important;
+            box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.25) !important;
+            background-color: #f3e5f5 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 開始畫面 (預設顯示) -->
+    <div id="start-screen" class="start-screen">
+        <div class="math-symbols" id="math-symbols"></div>
+        <div class="start-content">
+            <h1 class="text-4xl font-bold mb-4">因式分解測驗</h1>
+            <p class="text-xl mb-8">香港中學文憑試_卷一題型</p>
+            <div class="flex justify-center flex-wrap">
+                <button id="start-quiz-btn" class="start-btn">
+                    開始測驗
+                </button>
+                <button id="view-examples-btn" class="start-btn">
+                    查閱例題
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 例題展示介面 -->
+    <div id="examples-container" class="container mx-auto px-4 py-8 max-w-4xl hidden">
+        <header class="text-center mb-8 relative">
+            <button id="back-to-home-btn" class="btn-secondary absolute left-0 top-0 px-3 py-1 rounded">返回首頁</button>
+            <h1 class="text-3xl font-bold text-primary-color">因式分解 - 重點例題</h1>
+            <p class="text-gray-600 mt-2">溫習各類題型的解題步驟</p>
+        </header>
+        
+        <div id="example-card-container" class="example-card rounded-lg p-6 bg-white">
+            <!-- 例題內容動態生成 -->
+        </div>
+        
+        <div class="mt-8 flex justify-between nav-buttons">
+            <button id="prev-example" class="btn-secondary px-6 py-3 rounded-lg font-medium text-lg">
+                上一例題
+            </button>
+            <button id="next-example" class="btn-primary px-6 py-3 rounded-lg font-medium text-lg">
+                下一例題
+            </button>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <span id="example-progress" class="text-gray-600">例題 1 / 共 11 題</span>
+        </div>
+    </div>
+
+    <!-- 測驗主介面 -->
+    <div id="main-container" class="container mx-auto px-4 py-8 max-w-4xl hidden">
+        <header class="text-center mb-8 relative">
+            <button id="quiz-back-home-btn" class="btn-secondary absolute left-0 top-0 px-3 py-1 rounded">返回首頁</button>
+            <h1 class="text-3xl font-bold text-primary-color">因式分解測驗</h1>
+            <p class="text-gray-600 mt-2">香港中學文憑試_卷一題型</p>
+        </header>
+        
+        <div id="quiz-container">
+            <!-- 題目導航 -->
+            <div class="question-nav" id="question-nav">
+                <!-- 動態生成題目導航按鈕 -->
+            </div>
+            
+            <div id="question-container" class="question-card rounded-lg p-6">
+                <!-- 題目內容將在這裡動態生成 -->
+            </div>
+            
+            <div class="mt-8 flex justify-between nav-buttons pb-24">
+                <button id="prev-question" class="btn-secondary px-6 py-3 rounded-lg font-medium text-lg">
+                    上一題
+                </button>
+                <button id="next-question" class="btn-primary px-6 py-3 rounded-lg font-medium text-lg">
+                    下一題
+                </button>
+                <button id="submit-quiz" class="btn-primary px-6 py-3 rounded-lg font-medium text-lg hidden">
+                    提交測驗
+                </button>
+            </div>
+            
+            <div class="mt-4 text-center pb-8">
+                <span id="question-progress" class="text-gray-600">第 1 題 / 共 11 題</span>
+            </div>
+        </div>
+        
+        <div id="results-container" class="mt-8 hidden">
+            <div class="score-display mb-8">
+                <h2 class="text-2xl font-bold mb-4">測驗結果</h2>
+                <div class="score-number"><span id="score">0</span> / <span id="total-score">0</span></div>
+                <div class="mt-2 text-sm text-blue-100">（每個分題 1 分）</div>
+            </div>
+            <div id="detailed-results" class="space-y-6"></div>
+            <div class="mt-8 text-center pb-24">
+                <button id="retry-quiz" class="retry-btn px-6 py-3 rounded-lg font-medium text-lg">
+                    重新測驗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移除了全局虛擬鍵盤，改為嵌入式 -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 全局變量
+            let questions = [];
+            let currentQuestionIndex = 0;
+            let currentExampleIndex = 0;
+            // userAnswers 結構: [ { part1: "answer", part2: "answer" }, ... ]
+            let userAnswers = [];
+            
+            // 固定例題資料 (來自 PDF)
+            const fixedExamples = [
+                {
+                    id: 1,
+                    title: "例題 1",
+                    parts: [
+                        { label: "(a)", q: "$x^2-6xy+9y^2$", steps: [
+                            "$x^2-6xy+9y^2$",
+                            "$=(x-3y)^2$ <span class='step-note'>$完全平方恆等式: a^2-2ab+b^2 = (a-b)^2$</span>"
+                        ]},
+                        { label: "(b)", q: "$x^2-6xy+9y^2+7x-21y$", steps: [
+                            "$x^2-6xy+9y^2+7x-21y$",
+                            "$=(x-3y)^2+7x-21y$",
+                            "$=(x-3y)^2+7(x-3y)$",
+                            "$=(x-3y)(x-3y+7)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "例題 2",
+                    parts: [
+                        { label: "(a)", q: "$4m^2-25n^2$", steps: [
+                            "$4m^2-25n^2$",
+                            "$=(2m)^2-(5n)^2$",
+                            "$=(2m-5n)(2m+5n)$ <span class='step-note'>$平方差恆等式: a^2-b^2 = (a+b)(a-b)$</span>"
+                        ]},
+                        { label: "(b)", q: "$4m^2-25n^2+6m-15n$", steps: [
+                            "$4m^2-25n^2+6m-15n$",
+                            "$=(2m-5n)(2m+5n)+6m-15n$",
+                            "$=(2m-5n)(2m+5n)+3(2m-5n)$",
+                            "$=(2m-5n)(2m+5n+3)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "例題 3",
+                    parts: [
+                        { label: "(a)", q: "$a^2-2a-3$", steps: [
+                            "$a^2-2a-3$",
+                            "$=(a+1)(a-3)$"
+                        ]},
+                        { label: "(b)", q: "$ab^2+b^2+a^2-2a-3$", steps: [
+                            "$ab^2+b^2+a^2-2a-3$",
+                            "$=ab^2+b^2+(a+1)(a-3)$",
+                            "$=b^2(a+1)+(a+1)(a-3)$",
+                            "$=(a+1)(b^2+a-3)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 4,
+                    title: "例題 4",
+                    parts: [
+                        { label: "(a)", q: "$x^3+x^2y-7x^2$", steps: [
+                            "$x^3+x^2y-7x^2$",
+                            "$=x^2(x+y-7)$"
+                        ]},
+                        { label: "(b)", q: "$x^3+x^2y-7x^2-x-y+7$", steps: [
+                            "$x^3+x^2y-7x^2-x-y+7$",
+                            "$=x^2(x+y-7)-(x+y-7)$",
+                            "$=(x^2-1)(x+y-7)$",
+                            "$=(x-1)(x+1)(x+y-7)$ <span class='step-note'>$平方差恆等式: a^2-b^2 = (a+b)(a-b)$</span>"
+                        ]}
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "例題 5",
+                    parts: [
+                        { label: "(a)", q: "$5m-10n$", steps: [
+                            "$5m-10n$",
+                            "$=5(m-2n)$"
+                        ]},
+                        { label: "(b)", q: "$m^2+mn-6n^2$", steps: [
+                            "$m^2+mn-6n^2$",
+                            "$=(m+3n)(m-2n)$"
+                        ]},
+                        { label: "(c)", q: "$m^2+mn-6n^2-5m+10n$", steps: [
+                            "$m^2+mn-6n^2-5m+10n$",
+                            "$=(m+3n)(m-2n)-5(m-2n)$",
+                            "$=(m-2n)(m+3n-5)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 6,
+                    title: "例題 6",
+                    parts: [
+                        { label: "(a)", q: "$x^2-4xy+3y^2$", steps: [
+                            "$x^2-4xy+3y^2$",
+                            "$=(x-3y)(x-y)$"
+                        ]},
+                        { label: "(b)", q: "$x^2-4xy+3y^2+11x-33y$", steps: [
+                            "$x^2-4xy+3y^2+11x-33y$",
+                            "$=(x-3y)(x-y)+11(x-3y)$",
+                            "$=(x-3y)(x-y+11)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 7,
+                    title: "例題 7",
+                    parts: [
+                        { label: "(a)", q: "$9r^3-18r^2s$", steps: [
+                            "$9r^3-18r^2s$",
+                            "$=9r^2(r-2s)$"
+                        ]},
+                        { label: "(b)", q: "$9r^3-18r^2s-rs^2+2s^3$", steps: [
+                            "$9r^3-18r^2s-rs^2+2s^3$",
+                            "$=9r^2(r-2s)-s^2(r-2s)$",
+                            "$=(r-2s)(9r^2-s^2)$",
+                            "$=(r-2s)(3r-s)(3r+s)$ <span class='step-note'>$平方差恆等式: a^2-b^2 = (a+b)(a-b)$</span>"
+                        ]}
+                    ]
+                },
+                {
+                    id: 8,
+                    title: "例題 8",
+                    parts: [
+                        { label: "(a)", q: "$4m^2-9$", steps: [
+                            "$4m^2-9$",
+                            "$=(2m)^2-3^2$",
+                            "$=(2m+3)(2m-3)$ <span class='step-note'>$平方差恆等式: a^2-b^2 = (a+b)(a-b)$</span>"
+                        ]},
+                        { label: "(b)", q: "$2m^2n+7mn-15n$", steps: [
+                            "$2m^2n+7mn-15n$",
+                            "$=n(2m^2+7m-15)$",
+                            "$=n(2m-3)(m+5)$"
+                        ]},
+                        { label: "(c)", q: "$4m^2-9-2m^2n-7mn+15n$", steps: [
+                            "$4m^2-9-2m^2n-7mn+15n$",
+                            "$=(2m+3)(2m-3)-n(2m-3)(m+5)$",
+                            "$=(2m-3)(2m-mn-5n+3)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 9,
+                    title: "例題 9",
+                    parts: [
+                        { label: "(a)", q: "$k^2+k-6$", steps: [
+                            "$k^2+k-6$",
+                            "$=(k+3)(k-2)$"
+                        ]},
+                        { label: "(b)", q: "$k^4+k^3-6k^2$", steps: [
+                            "$k^4+k^3-6k^2$",
+                            "$=k^2(k^2+k-6)$",
+                            "$=k^2(k+3)(k-2)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 10,
+                    title: "例題 10",
+                    parts: [
+                        { label: "(a)", q: "$6x^2+xy-2y^2$", steps: [
+                            "$6x^2+xy-2y^2$",
+                            "$=(2x-y)(3x+2y)$"
+                        ]},
+                        { label: "(b)", q: "$8x-4y-6x^2-xy+2y^2$", steps: [
+                            "$8x-4y-6x^2-xy+2y^2$",
+                            "$=4(2x-y)-(6x^2+xy-2y^2)$",
+                            "$=4(2x-y)-(2x-y)(3x+2y)$",
+                            "$=(2x-y)(4-3x-2y)$"
+                        ]}
+                    ]
+                },
+                {
+                    id: 11,
+                    title: "例題 11",
+                    parts: [
+                        { label: "(a)", q: "$9c^2-6c+1$", steps: [
+                            "$9c^2-6c+1$",
+                            "$=(3c-1)^2$ <span class='step-note'>$完全平方恆等式: a^2-2ab+b^2 = (a-b)^2$</span>"
+                        ]},
+                        { label: "(b)", q: "$(4c+d)^2-9c^2+6c-1$", steps: [
+                            "$(4c+d)^2-9c^2+6c-1$",
+                            "=$(4c+d)^2-(9c^2-6c+1)$",
+                            "=$(4c+d)^2-(3c-1)^2$",
+                            "=$(4c+d+3c-1)(4c+d-(3c-1))$ <span class='step-note'>$平方差恆等式: a^2-b^2 = (a+b)(a-b)$</span>",
+                            "=$(7c+d-1)(c+d+1)$"
+                        ]}
+                    ]
+                }
+            ];
+            
+            // 創建數學符號背景
+            createMathSymbols();
+            
+            // 按鈕事件監聽器
+            
+            // 開始測驗按鈕
+            document.getElementById('start-quiz-btn').addEventListener('click', function() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('main-container').classList.remove('hidden');
+                initQuiz();
+            });
+
+            // 查閱例題按鈕
+            document.getElementById('view-examples-btn').addEventListener('click', function() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('examples-container').classList.remove('hidden');
+                currentExampleIndex = 0;
+                renderCurrentExample();
+            });
+
+            // 返回首頁按鈕 (例題頁面)
+            document.getElementById('back-to-home-btn').addEventListener('click', function() {
+                document.getElementById('examples-container').classList.add('hidden');
+                document.getElementById('start-screen').classList.remove('hidden');
+            });
+
+            // 返回首頁按鈕 (測驗頁面)
+            document.getElementById('quiz-back-home-btn').addEventListener('click', function() {
+                document.getElementById('main-container').classList.add('hidden');
+                document.getElementById('results-container').classList.add('hidden');
+                document.getElementById('start-screen').classList.remove('hidden');
+            });
+
+            // 下一題按鈕 (測驗)
+            document.getElementById('next-question').addEventListener('click', function() {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    renderCurrentQuestion();
+                    renderQuestionNav();
+                }
+            });
+            
+            // 上一題按鈕 (測驗)
+            document.getElementById('prev-question').addEventListener('click', function() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    renderCurrentQuestion();
+                    renderQuestionNav();
+                }
+            });
+
+            // 下一例題按鈕
+            document.getElementById('next-example').addEventListener('click', function() {
+                if (currentExampleIndex < fixedExamples.length - 1) {
+                    currentExampleIndex++;
+                    renderCurrentExample();
+                }
+            });
+
+            // 上一例題按鈕
+            document.getElementById('prev-example').addEventListener('click', function() {
+                if (currentExampleIndex > 0) {
+                    currentExampleIndex--;
+                    renderCurrentExample();
+                }
+            });
+            
+            // 提交測驗按鈕
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                showResults();
+            });
+            
+            // 重新測驗按鈕
+            document.getElementById('retry-quiz').addEventListener('click', function() {
+                const quizContainer = document.getElementById('quiz-container');
+                const resultsContainer = document.getElementById('results-container');
+                
+                resultsContainer.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                
+                initQuiz();
+            });
+            
+            // 渲染當前例題
+            function renderCurrentExample() {
+                const example = fixedExamples[currentExampleIndex];
+                const container = document.getElementById('example-card-container');
+                const prevBtn = document.getElementById('prev-example');
+                const nextBtn = document.getElementById('next-example');
+                const progress = document.getElementById('example-progress');
+
+                // 更新按鈕狀態
+                if (currentExampleIndex === 0) {
+                    prevBtn.disabled = true;
+                    prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    prevBtn.disabled = false;
+                    prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+
+                if (currentExampleIndex === fixedExamples.length - 1) {
+                    nextBtn.disabled = true;
+                    nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+
+                // 更新進度
+                progress.textContent = `例題 ${currentExampleIndex + 1} / 共 ${fixedExamples.length} 題`;
+
+                // 生成例題內容 HTML
+                let partsHtml = '';
+                example.parts.forEach(part => {
+                    const stepsHtml = part.steps.map(step => `<div class="mb-2 pl-4 border-l-2 border-gray-200">${step}</div>`).join('');
+                    partsHtml += `
+                        <div class="mb-6">
+                            <div class="font-bold text-lg mb-2 text-primary-color border-b pb-1">${part.label}</div>
+                            <div class="mb-3 font-medium">題目：${part.q}</div>
+                            <div class="bg-gray-50 p-4 rounded text-gray-800">
+                                ${stepsHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = `
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-primary-color mb-4">${example.title}</h2>
+                        ${partsHtml}
+                    </div>
+                `;
+
+                MathJax.typeset([container]);
+            }
+
+            // 創建數學符號背景
+            function createMathSymbols(containerId = 'math-symbols') {
+                const symbols = ['x²', 'y²', '(x+y)', '(a-b)', 'a²', 'b³', '2ab', '√', '∫', '∑', '≠', '≈', '≤', '≥', '∈'];
+                const container = document.getElementById(containerId);
+                
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 50; i++) {
+                    const symbol = document.createElement('div');
+                    symbol.className = 'math-symbol';
+                    symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    const size = Math.random() * 20 + 15;
+                    const rotation = Math.random() * 360;
+                    
+                    symbol.style.left = `${x}%`;
+                    symbol.style.top = `${y}%`;
+                    symbol.style.fontSize = `${size}px`;
+                    symbol.style.transform = `rotate(${rotation}deg)`;
+                    
+                    container.appendChild(symbol);
+                }
+            }
+            
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            // 計算最大公因數 (GCD)
+            function gcd(a, b) {
+                return b === 0 ? a : gcd(b, a % b);
+            }
+
+            // 輔助函數：格式化係數
+            function fmtCoeff(n) {
+                if (n === 1) return "";
+                if (n === -1) return "-";
+                return n;
+            }
+
+            // 輔助函數：格式化各項（含符號）
+            function fmtTerm(coeff, variable = "", isFirstTerm = false) {
+                if (coeff === 0) return "";
+                
+                let sign = "";
+                if (coeff > 0) {
+                    sign = isFirstTerm ? "" : "+";
+                } else {
+                    sign = "-";
+                }
+                
+                let absVal = Math.abs(coeff);
+                let valStr = absVal === 1 && variable !== "" ? "" : absVal;
+                
+                return `${sign}${valStr}${variable}`;
+            }
+
+            // 輔助函數：生成一個多項式的所有項的排列組合 (例如 x-2y+5 -> 5+x-2y, -2y+x+5 ...)
+            function getPolyVariants(terms) {
+                const results = [];
+                
+                function permute(arr, m = []) {
+                    if (arr.length === 0) {
+                        let str = m.join('');
+                        // 去除首個加號
+                        if (str.startsWith('+')) str = str.substring(1);
+                        results.push('(' + str + ')');
+                    } else {
+                        for (let i = 0; i < arr.length; i++) {
+                            let curr = arr.slice();
+                            let next = curr.splice(i, 1);
+                            permute(curr.slice(), m.concat(next));
+                        }
+                    }
+                }
+                
+                permute(terms);
+                return results;
+            }
+
+            // 輔助函數：根據項的陣列構建答案
+            // input: [ ['+x', '-y'], ['+x', '+y'] ]
+            // output: array of valid answer strings considering term permutations and factor permutations
+            function buildAnswers(factorsTerms) {
+                // 1. 為每個因式生成所有項的排列
+                const factorsVariants = factorsTerms.map(terms => getPolyVariants(terms));
+                
+                // 2. 生成負號版本的因式 (例如 (x-y) 對應 (y-x))
+                // 對於每一個項變號
+                const negatedFactorsTerms = factorsTerms.map(terms => {
+                    return terms.map(t => {
+                        if (t.startsWith('+')) return t.replace('+', '-');
+                        if (t.startsWith('-')) return t.replace('-', '+');
+                        return t; // should not happen with fmtTerm
+                    });
+                });
+                const negatedFactorsVariants = negatedFactorsTerms.map(terms => getPolyVariants(terms));
+
+                // 3. 生成組合
+                // 基礎組合: A * B
+                let combs = getCartesianProduct(factorsVariants);
+                
+                // 雙重變號組合: (-A) * (-B) (僅當有偶數個因式時，或者我們簡單地接受所有成對變號? 
+                // 簡單起見，我們接受全變號 (若偶數個因式) 
+                // 但對於題目來說，通常是2個因式。 (-A)(-B) = A*B.
+                if (factorsTerms.length === 2) {
+                    const negCombs = getCartesianProduct(negatedFactorsVariants);
+                    combs = [...combs, ...negCombs];
+                }
+                
+                // 處理平方: 如果 factor1 == factor2 (deep equal terms), 則添加 ^2 形式
+                // 檢查是否所有因式相同
+                // 這裡簡化檢查：如果 factorsTerms[0] 和 factorsTerms[1] 的內容相同
+                let isSquare = false;
+                if (factorsTerms.length === 2) {
+                    const t1 = [...factorsTerms[0]].sort().join('');
+                    const t2 = [...factorsTerms[1]].sort().join('');
+                    if (t1 === t2) isSquare = true;
+                }
+
+                let finalAnswers = [];
+                
+                combs.forEach(comb => {
+                    // comb is like ['(x-y)', '(x+y)']
+                    
+                    // 1. 正序
+                    finalAnswers.push(comb.join(''));
+                    
+                    // 2. 反序 (如果不同)
+                    if (comb.length > 1) {
+                        // 簡單的全排列因式
+                        const reversed = [...comb].reverse().join('');
+                        if (reversed !== finalAnswers[finalAnswers.length-1]) {
+                            finalAnswers.push(reversed);
+                        }
+                    }
+                    
+                    // 3. 平方寫法
+                    if (isSquare && comb[0] === comb[1]) {
+                        finalAnswers.push(comb[0] + '^2');
+                    }
+                });
+
+                return finalAnswers;
+            }
+
+            // 輔助：笛卡兒積
+            function getCartesianProduct(arrays) {
+                return arrays.reduce((acc, curr) => {
+                    return acc.flatMap(a => curr.map(c => [a, c].flat()));
+                }, [[]]);
+            }
+            
+            // 生成因式分解題目 (基於提供的 11 種題型)
+            function generateQuestions() {
+                const questions = [
+                    // 題型 1: (a) 完全平方 (b) 分組
+                    (() => {
+                        let a, b;
+                        do {
+                            a = getRandomInt(1, 3);
+                            b = getRandomInt(1, 4);
+                        } while (gcd(a, b) !== 1);
+                        
+                        const k = getRandomInt(2, 8);
+                        
+                        const term1 = (a*a); // x^2 coeff
+                        const term2 = -2*a*b; // xy coeff (negative)
+                        const term3 = (b*b); // y^2 coeff
+                        
+                        const t1 = fmtTerm(term1, "x^2", true); // cosmetic only
+                        const t2 = fmtTerm(term2, "xy");
+                        const t3 = fmtTerm(term3, "y^2");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        
+                        // 定義項 (用於邏輯)
+                        const termAx = fmtTerm(a, "x");
+                        const termBy = fmtTerm(-b, "y");
+                        
+                        const f1Terms = [termAx, termBy];
+                        const f1TermsNeg = [fmtTerm(-a, "x"), fmtTerm(b, "y")]; // -(ax-by) = -ax+by
+                        
+                        // (a) 是平方題，需要手動構建答案因為 buildAnswers 預設處理乘積
+                        // 但我們可以把平方視為 (ax-by)(ax-by)
+                        const ansA = buildAnswers([f1Terms, f1Terms]); 
+                        const partA_Ans = `(${a===1?'x':a+'x'}-${b===1?'y':b+'y'})^2`;
+                                          
+                        // part B
+                        const termK = fmtTerm(k, "");
+                        const t4 = fmtTerm(k*a, "x");
+                        const t5 = fmtTerm(-k*b, "y");
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}${t4}${t5}$。`;
+                        
+                        const f2Terms = [termAx, termBy, termK];
+                        const ansB = buildAnswers([f1Terms, f2Terms]);
+                        
+                        const partB_Ans = `(${a===1?'x':a+'x'}-${b===1?'y':b+'y'})(${a===1?'x':a+'x'}-${b===1?'y':b+'y'}+${k})`;
+                        
+                        return {
+                            id: 1,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 2: (a) 平方差 (b) 分組 + (a)
+                    (() => {
+                        let a, b;
+                        do {
+                            a = getRandomInt(2, 5);
+                            b = getRandomInt(2, 6);
+                        } while (gcd(a, b) !== 1);
+                        
+                        const k = getRandomInt(2, 5);
+                        
+                        const t1 = fmtTerm(a*a, "m^2", true);
+                        const t2 = fmtTerm(-(b*b), "n^2");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}$。`;
+                        const partA_Ans = `(${a}m-${b}n)(${a}m+${b}n)`;
+                        
+                        const f1Terms = [fmtTerm(a, "m"), fmtTerm(-b, "n")];
+                        const f2Terms = [fmtTerm(a, "m"), fmtTerm(b, "n")];
+                        
+                        const ansA = buildAnswers([f1Terms, f2Terms]);
+                        
+                        const t3 = fmtTerm(k*a, "m");
+                        const t4 = fmtTerm(-k*b, "n");
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}${t4}$。`;
+                        const partB_Ans = `(${a}m-${b}n)(${a}m+${b}n+${k})`;
+                        
+                        const f3Terms = [fmtTerm(a, "m"), fmtTerm(b, "n"), fmtTerm(k, "")];
+                        const ansB = buildAnswers([f1Terms, f3Terms]);
+                        
+                        return {
+                            id: 2,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 3: (a) 簡單二次三項式 (b) 分組 + (a)
+                    (() => {
+                        const p = getRandomInt(1, 5);
+                        const q = getRandomInt(-5, -2);
+                        
+                        const t1 = "a^2";
+                        const t2 = fmtTerm(p+q, "a");
+                        const t3 = fmtTerm(p*q, "");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        const pStr = p >= 0 ? `+${p}` : p;
+                        const qStr = q >= 0 ? `+${q}` : q;
+                        const partA_Ans = `(a${pStr})(a${qStr})`;
+                        
+                        const f1Terms = [fmtTerm(1, "a"), fmtTerm(p, "")];
+                        const f2Terms = [fmtTerm(1, "a"), fmtTerm(q, "")];
+                        const ansA = buildAnswers([f1Terms, f2Terms]);
+                        
+                        // Sample Q3 forced p=1
+                        const p_fixed = 1;
+                        const q_rand = getRandomInt(-5, -2);
+                        const ft2 = fmtTerm(1+q_rand, "a");
+                        const ft3 = fmtTerm(q_rand, "");
+                        
+                        const partA_Q_fixed = `因式分解 $a^2${ft2}${ft3}$。`;
+                        const partA_Ans_fixed = `(a+1)(a${q_rand})`;
+                        
+                        const f1TermsFixed = [fmtTerm(1, "a"), fmtTerm(1, "")];
+                        const f2TermsFixed = [fmtTerm(1, "a"), fmtTerm(q_rand, "")];
+                        const ansAFixed = buildAnswers([f1TermsFixed, f2TermsFixed]);
+                        
+                        const partB_Q_fixed = `因式分解 $ab^2 + b^2 + a^2${ft2}${ft3}$。`;
+                        const partB_Ans_fixed = `(a+1)(b^2+a${q_rand})`;
+                        
+                        const f3Terms = [fmtTerm(1, "b^2"), fmtTerm(1, "a"), fmtTerm(q_rand, "")];
+                        const ansBFixed = buildAnswers([f1TermsFixed, f3Terms]);
+                        
+                        return {
+                            id: 3,
+                            parts: [
+                                { label: "(a)", question: partA_Q_fixed, answer: partA_Ans_fixed, correctAnswers: ansAFixed },
+                                { label: "(b)", question: partB_Q_fixed, answer: partB_Ans_fixed, correctAnswers: ansBFixed }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 4: (a) 公因式 (b) 分組 -> 平方差
+                    (() => {
+                        const k = getRandomInt(2, 9);
+                        
+                        const t1 = "x^3";
+                        const t2 = "+x^2y";
+                        const t3 = fmtTerm(-k, "x^2");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        const partA_Ans = `x^2(x+y-${k})`;
+                        
+                        // (a) is monomial * poly. buildAnswers handles poly*poly.
+                        // We construct manually or adapt logic.
+                        // Correct answer: x^2(x+y-k) or (x+y-k)x^2
+                        const polyTerms = [fmtTerm(1, "x"), fmtTerm(1, "y"), fmtTerm(-k, "")];
+                        const polyVars = getPolyVariants(polyTerms);
+                        const ansA = polyVars.map(p => `x^2${p}`).concat(polyVars.map(p => `${p}x^2`));
+                        
+                        const t4 = "-x";
+                        const t5 = "-y";
+                        const t6 = fmtTerm(k, "");
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}${t4}${t5}${t6}$。`;
+                        const partB_Ans = `(x-1)(x+1)(x+y-${k})`;
+                        
+                        const f1 = [fmtTerm(1, "x"), fmtTerm(-1, "")];
+                        const f2 = [fmtTerm(1, "x"), fmtTerm(1, "")];
+                        const f3 = polyTerms;
+                        
+                        // buildAnswers currently supports 2 factors. Let's chain it or just use perms.
+                        // For 3 factors, it's safer to just do permutations of factors + sign variants.
+                        // Because n=3, (-A)(-B)(-C) != A B C. 
+                        // Only (-A)(-B)C = ABC.
+                        // Let's rely on standard order + swapped order for simplicity for 3 factors, 
+                        // AND term variants.
+                        
+                        const v1 = getPolyVariants(f1);
+                        const v2 = getPolyVariants(f2);
+                        const v3 = getPolyVariants(f3);
+                        
+                        let ansB = [];
+                        v1.forEach(s1 => {
+                            v2.forEach(s2 => {
+                                v3.forEach(s3 => {
+                                    ansB.push(s1+s2+s3); // (x-1)(x+1)(x+y-k)
+                                    ansB.push(s1+s3+s2);
+                                    ansB.push(s2+s1+s3);
+                                    ansB.push(s2+s3+s1);
+                                    ansB.push(s3+s1+s2);
+                                    ansB.push(s3+s2+s1);
+                                });
+                            });
+                        });
+                        
+                        return {
+                            id: 4,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 5: (a) 公因式 (b) 二次 (c) 組合
+                    (() => {
+                        const k = getRandomInt(2, 6);
+                        const c1 = getRandomInt(1, 4);
+                        const c2 = getRandomInt(2, 5); 
+                        
+                        const prod = -1 * c1 * c2;
+                        const sum = c1 - c2;
+                        
+                        const at1 = fmtTerm(k, "m", true);
+                        const at2 = fmtTerm(-k*c2, "n");
+                        const partA_Q = `因式分解 $${at1}${at2}$。`;
+                        const partA_Ans = `${k}(m-${c2}n)`;
+                        // k(m-c2n) or k(-c2n+m)
+                        const polyVarsA = getPolyVariants([fmtTerm(1, "m"), fmtTerm(-c2, "n")]);
+                        const ansA = polyVarsA.map(p => `${k}${p}`);
+                        
+                        const bt1 = "m^2";
+                        const bt2 = fmtTerm(sum, "mn");
+                        const bt3 = fmtTerm(prod, "n^2");
+                        const partB_Q = `因式分解 $${bt1}${bt2}${bt3}$。`;
+                        
+                        const f1 = [fmtTerm(1, "m"), fmtTerm(c1, "n")];
+                        const f2 = [fmtTerm(1, "m"), fmtTerm(-c2, "n")];
+                        const ansB = buildAnswers([f1, f2]);
+                        const partB_Ans = `(m+${c1}n)(m-${c2}n)`;
+                        
+                        const ct1 = fmtTerm(-k, "m");
+                        const ct2 = fmtTerm(k*c2, "n");
+                        const partC_Q = `因式分解 $${bt1}${bt2}${bt3}${ct1}${ct2}$。`;
+                        
+                        const f3 = [fmtTerm(1, "m"), fmtTerm(c1, "n"), fmtTerm(-k, "")];
+                        const ansC = buildAnswers([f2, f3]);
+                        const partC_Ans = `(m-${c2}n)(m+${c1}n-${k})`;
+                        
+                        return {
+                            id: 5,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB },
+                                { label: "(c)", question: partC_Q, answer: partC_Ans, correctAnswers: ansC }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 6: (a) 二次 (b) 組合
+                    (() => {
+                        const c1 = getRandomInt(1, 5);
+                        const c2 = getRandomInt(1, 5); 
+                        
+                        const sum = -(c1 + c2);
+                        const prod = c1 * c2;
+                        
+                        const t1 = "x^2";
+                        const t2 = fmtTerm(sum, "xy");
+                        const t3 = fmtTerm(prod, "y^2");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        
+                        const f1 = [fmtTerm(1, "x"), fmtTerm(-c1, "y")];
+                        const f2 = [fmtTerm(1, "x"), fmtTerm(-c2, "y")];
+                        const ansA = buildAnswers([f1, f2]);
+                        const partA_Ans = c1===c2 ? `(x-${c1}y)^2` : `(x-${c1}y)(x-${c2}y)`;
+                        
+                        const k = getRandomInt(2, 9);
+                        const t4 = fmtTerm(k, "x");
+                        const t5 = fmtTerm(-k*c2, "y");
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}${t4}${t5}$。`;
+                        
+                        const f3 = [fmtTerm(1, "x"), fmtTerm(-c1, "y"), fmtTerm(k, "")];
+                        const ansB = buildAnswers([f2, f3]);
+                        const partB_Ans = `(x-${c2}y)(x-${c1}y+${k})`;
+                        
+                        return {
+                            id: 6,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 7: (a) 公因式 (b) 平方差
+                    (() => {
+                        const k = getRandomInt(2, 5);
+                        const kSq = k*k;
+                        
+                        const t1 = fmtTerm(kSq, "r^3", true);
+                        const t2 = fmtTerm(-2*kSq, "r^2s");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}$。`;
+                        const partA_Ans = `${kSq}r^2(r-2s)`;
+                        
+                        const polyVars = getPolyVariants([fmtTerm(1, "r"), fmtTerm(-2, "s")]);
+                        const ansA = polyVars.map(p => `${kSq}r^2${p}`);
+                        
+                        const t3 = "-rs^2";
+                        const t4 = "+2s^3";
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}${t4}$。`;
+                        const partB_Ans = `(r-2s)(${k}r-s)(${k}r+s)`;
+                        
+                        const f1 = [fmtTerm(1, "r"), fmtTerm(-2, "s")];
+                        const f2 = [fmtTerm(k, "r"), fmtTerm(-1, "s")];
+                        const f3 = [fmtTerm(k, "r"), fmtTerm(1, "s")];
+                        
+                        const v1 = getPolyVariants(f1);
+                        const v2 = getPolyVariants(f2);
+                        const v3 = getPolyVariants(f3);
+                        let ansB = [];
+                        // 3 factors, no double-negation flip for triple unless...
+                        // Just do perms
+                        v1.forEach(s1 => {
+                            v2.forEach(s2 => {
+                                v3.forEach(s3 => {
+                                    ansB.push(s1+s2+s3); 
+                                    ansB.push(s1+s3+s2);
+                                });
+                            });
+                        });
+                        
+                        return {
+                            id: 7,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 8: (a) 平方差 (b) 公因式+二次 (c) 組合
+                    (() => {
+                        const a = 2; 
+                        const b = 3; 
+                        
+                        const partA_Q = `因式分解 $4m^2 - 9$。`;
+                        const f1 = [fmtTerm(2, "m"), fmtTerm(3, "")];
+                        const f2 = [fmtTerm(2, "m"), fmtTerm(-3, "")];
+                        const ansA = buildAnswers([f1, f2]);
+                        const partA_Ans = `(2m+3)(2m-3)`;
+                        
+                        const k = getRandomInt(2, 5);
+                        const midCoeff = 2*k - 3;
+                        const lastCoeff = -3 * k;
+                        
+                        const t1 = "2m^2n";
+                        const t2 = fmtTerm(midCoeff, "mn");
+                        const t3 = fmtTerm(lastCoeff, "n");
+                        
+                        const partB_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        const partB_Ans = `n(2m-3)(m+${k})`;
+                        
+                        const f3 = [fmtTerm(1, "m"), fmtTerm(k, "")];
+                        const v2 = getPolyVariants(f2);
+                        const v3 = getPolyVariants(f3);
+                        let ansB = [];
+                        v2.forEach(s2 => {
+                            v3.forEach(s3 => {
+                                ansB.push(`n${s2}${s3}`);
+                                ansB.push(`n${s3}${s2}`);
+                            });
+                        });
+                        
+                        const ct1 = "-2m^2n";
+                        const ct2 = fmtTerm(-midCoeff, "mn");
+                        const ct3 = fmtTerm(-lastCoeff, "n");
+                        
+                        const partC_Q = `因式分解 $4m^2 - 9 ${ct1}${ct2}${ct3}$。`;
+                        
+                        const f4 = [fmtTerm(2, "m"), fmtTerm(3, ""), fmtTerm(-1, "mn"), fmtTerm(-k, "n")];
+                        const ansC = buildAnswers([f2, f4]);
+                        const partC_Ans = `(2m-3)(2m+3-mn-${k}n)`;
+                        
+                        return {
+                            id: 8,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB },
+                                { label: "(c)", question: partC_Q, answer: partC_Ans, correctAnswers: ansC }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 9: (a) k^2+k-c (b) k^4+k^3-ck^2
+                    (() => {
+                        let c1, c2;
+                        do {
+                            c1 = getRandomInt(2, 4);
+                            c2 = getRandomInt(1, 3);
+                        } while (c1 === c2); 
+                        
+                        const sum = c1 - c2;
+                        const prod = -c1 * c2;
+                        
+                        const t1 = "k^2";
+                        const t2 = fmtTerm(sum, "k");
+                        const t3 = fmtTerm(prod, "");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        const f1 = [fmtTerm(1, "k"), fmtTerm(c1, "")];
+                        const f2 = [fmtTerm(1, "k"), fmtTerm(-c2, "")];
+                        const ansA = buildAnswers([f1, f2]);
+                        const partA_Ans = `(k+${c1})(k-${c2})`;
+                        
+                        const bt1 = "k^4";
+                        const bt2 = fmtTerm(sum, "k^3");
+                        const bt3 = fmtTerm(prod, "k^2");
+                        
+                        const partB_Q = `因式分解 $${bt1}${bt2}${bt3}$。`;
+                        const partB_Ans = `k^2(k+${c1})(k-${c2})`;
+                        const ansB = ansA.map(a => `k^2${a}`);
+                        
+                        return {
+                            id: 9,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 10: (a) 較難二次 (b) 線性 - (a)
+                    (() => {
+                        const a = 2;
+                        const b = 3;
+                        let c;
+                        do {
+                            c = getRandomInt(2, 4);
+                        } while (gcd(b, c) !== 1);
+                        
+                        const x2_coeff = a * b;
+                        const xy_coeff = a * c - b;
+                        const y2_coeff = -c;
+                        
+                        const t1 = fmtTerm(x2_coeff, "x^2", true);
+                        const t2 = fmtTerm(xy_coeff, "xy");
+                        const t3 = fmtTerm(y2_coeff, "y^2");
+                        
+                        const partA_Q = `因式分解 $${t1}${t2}${t3}$。`;
+                        const f1 = [fmtTerm(a, "x"), fmtTerm(-1, "y")];
+                        const f2 = [fmtTerm(b, "x"), fmtTerm(c, "y")];
+                        const ansA = buildAnswers([f1, f2]);
+                        const partA_Ans = `(${a}x-y)(${b}x+${c}y)`;
+                        
+                        const k = getRandomInt(2, 5);
+                        const lin_x = k * a;
+                        const lin_y = -k;
+                        
+                        const t4 = fmtTerm(lin_x, "x", true);
+                        const t5 = fmtTerm(lin_y, "y");
+                        const t6 = fmtTerm(-x2_coeff, "x^2");
+                        const t7 = fmtTerm(-xy_coeff, "xy");
+                        const t8 = fmtTerm(-y2_coeff, "y^2");
+                        
+                        const partB_Q = `因式分解 $${t4}${t5}${t6}${t7}${t8}$。`;
+                        
+                        const f3 = [fmtTerm(k, ""), fmtTerm(-b, "x"), fmtTerm(-c, "y")];
+                        const ansB = buildAnswers([f1, f3]);
+                        const partB_Ans = `(${a}x-y)(${k}-${b}x-${c}y)`;
+                        
+                        return {
+                            id: 10,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })(),
+                    
+                    // 題型 11: (a) 完全平方 (b) 平方差
+                    (() => {
+                        const a = 3;
+                        const b = 1; 
+                        const term1 = 9;
+                        const term2 = 6;
+                        
+                        const partA_Q = `因式分解 $${term1}c^2 - ${term2}c + 1$。`;
+                        const f1 = [fmtTerm(a, "c"), fmtTerm(-1, "")];
+                        const ansA = buildAnswers([f1, f1]);
+                        const partA_Ans = `(${a}c-1)^2`;
+                        
+                        const k = 4; 
+                        
+                        const partB_Q = `因式分解 $(${k}c+d)^2 - ${term1}c^2 + ${term2}c - 1$。`;
+                        
+                        const termSum = k + a;
+                        const termDiff = k - a;
+                        
+                        const f2 = [fmtTerm(termSum, "c"), fmtTerm(1, "d"), fmtTerm(-1, "")];
+                        const f3 = [fmtTerm(termDiff, "c"), fmtTerm(1, "d"), fmtTerm(1, "")];
+                        const ansB = buildAnswers([f2, f3]);
+                        
+                        const partB_Ans = `(${termSum}c+d-1)(${termDiff===1?'':termDiff}c+d+1)`;
+                        
+                        return {
+                            id: 11,
+                            parts: [
+                                { label: "(a)", question: partA_Q, answer: partA_Ans, correctAnswers: ansA },
+                                { label: "(b)", question: partB_Q, answer: partB_Ans, correctAnswers: ansB }
+                            ]
+                        };
+                    })()
+                ];
+                return questions;
+            }
+            
+            // 產生所有可能的因式排列組合
+            function generatePermutations(factors) {
+                const results = [];
+                
+                function permute(arr, m = []) {
+                    if (arr.length === 0) {
+                        results.push(m.join(''));
+                    } else {
+                        for (let i = 0; i < arr.length; i++) {
+                            let curr = arr.slice();
+                            let next = curr.splice(i, 1);
+                            permute(curr.slice(), m.concat(next));
+                        }
+                    }
+                }
+                
+                permute(factors);
+                return results;
+            }
+            
+            // 檢查答案
+            function checkAnswer(userAnswer, correctAnswers) {
+                if (!userAnswer) return false;
+                
+                // 標準化用戶答案
+                let normalized = userAnswer.replace(/\s+/g, ''); // 移除空格
+                normalized = normalized.replace(/\*/g, '');      // 移除乘號
+                normalized = normalized.replace(/\\cdot/g, ''); 
+                normalized = normalized.replace(/\\times/g, '');
+                
+                // 處理係數為 1 的變數顯示
+                normalized = normalized.replace(/^1([a-z])/g, '$1');
+                normalized = normalized.replace(/([\+\-\(])1([a-z])/g, '$1$2');
+                
+                normalized = normalized.replace(/^-1([a-z])/g, '-$1');
+                normalized = normalized.replace(/(\()-1([a-z])/g, '$1-$2');
+                
+                for (let correct of correctAnswers) {
+                    let normalizedCorrect = correct.replace(/\s+/g, '').replace(/\*/g, '');
+                    
+                    normalizedCorrect = normalizedCorrect.replace(/^1([a-z])/g, '$1');
+                    normalizedCorrect = normalizedCorrect.replace(/([\+\-\(])1([a-z])/g, '$1$2');
+                    
+                    normalizedCorrect = normalizedCorrect.replace(/^-1([a-z])/g, '-$1');
+                    normalizedCorrect = normalizedCorrect.replace(/(\()-1([a-z])/g, '$1-$2');
+                    
+                    if (normalized === normalizedCorrect) return true;
+                }
+                
+                return false;
+            }
+            
+            // 渲染題目導航
+            function renderQuestionNav() {
+                const navContainer = document.getElementById('question-nav');
+                navContainer.innerHTML = '';
+                
+                for (let i = 0; i < questions.length; i++) {
+                    const btn = document.createElement('button');
+                    // 檢查該題的所有部分是否都已填寫
+                    const isAnswered = userAnswers[i] && Object.keys(userAnswers[i]).length === questions[i].parts.length && 
+                                       Object.values(userAnswers[i]).every(val => val !== '');
+                                       
+                    btn.className = `question-nav-btn ${i === currentQuestionIndex ? 'active' : ''} ${isAnswered ? 'answered' : ''}`;
+                    btn.textContent = i + 1;
+                    btn.setAttribute('data-index', i);
+                    
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        currentQuestionIndex = index; 
+                        renderCurrentQuestion();
+                        renderQuestionNav();
+                    });
+                    
+                    navContainer.appendChild(btn);
+                }
+            }
+            
+            // 產生按鈕鍵盤 HTML
+            function getInlineKeyboardHtml(qIdx, pIdx) {
+                return `
+                <div class="inline-keyboard" id="keyboard-${qIdx}-${pIdx}">
+                    <div class="keyboard-grid">
+                        <div class="keyboard-row">
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="x">x</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="y">y</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="m">m</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="n">n</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="a">a</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="b">b</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="k">k</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="c">c</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="d">d</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="r">r</button>
+                            <button class="key-btn variable" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="s">s</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key-btn operator" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="(">(</button>
+                            <button class="key-btn operator" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key=")">)</button>
+                            <button class="key-btn operator" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="^">^</button>
+                            <button class="key-btn operator" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="+">+</button>
+                            <button class="key-btn operator" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="-">-</button>
+                            <button class="key-btn action" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="backspace">⌫</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="1">1</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="2">2</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="3">3</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="4">4</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="5">5</button>
+                        </div>
+                        <div class="keyboard-row">
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="6">6</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="7">7</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="8">8</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="9">9</button>
+                            <button class="key-btn number" onclick="handleKeyClick(this)" data-input="answer-${qIdx}-${pIdx}" data-key="0">0</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
+
+            // 全局處理按鍵點擊
+            window.handleKeyClick = function(btn) {
+                const inputId = btn.getAttribute('data-input');
+                const key = btn.getAttribute('data-key');
+                const inputField = document.getElementById(inputId);
+                
+                if (!inputField) return;
+                
+                // 聚焦輸入框以顯示高亮
+                document.querySelectorAll('.answer-input').forEach(el => el.classList.remove('input-active'));
+                inputField.classList.add('input-active');
+
+                // 獲取當前值和光標位置 (雖然readonly，但部分瀏覽器允許獲取光標，如果不行則追加到末尾)
+                let start = inputField.selectionStart;
+                let end = inputField.selectionEnd;
+                let value = inputField.value;
+
+                // 如果 input 是 readonly，selectionStart 可能總是 0 或者不可靠
+                // 為了簡單起見，在 readonly 模式下，我們默認追加到末尾，或者如果支持光標則用光標
+                // 大多數移動瀏覽器 readonly 不顯示光標，所以追加到末尾最安全
+                // 如果需要刪除，則刪除最後一個字符
+                
+                // 嘗試更聰明的方法：我們維護一個內存中的值? 
+                // 不，直接操作 DOM value 簡單。
+                
+                if (key === 'backspace') {
+                    if (value.length > 0) {
+                        inputField.value = value.slice(0, -1);
+                    }
+                } else {
+                    inputField.value = value + key;
+                }
+                
+                // 觸發事件
+                const qIdx = inputField.getAttribute('data-question');
+                const pIdx = inputField.getAttribute('data-part');
+                const previewDiv = document.getElementById(`preview-${qIdx}-${pIdx}`);
+                
+                // 更新預覽
+                updatePreview(inputField.value, previewDiv);
+                
+                // 儲存答案
+                userAnswers[qIdx][pIdx] = inputField.value;
+                renderQuestionNav();
+            };
+            
+            // 渲染當前題目
+            function renderCurrentQuestion() {
+                const questionContainer = document.getElementById('question-container');
+                const question = questions[currentQuestionIndex];
+                const prevButton = document.getElementById('prev-question');
+                const nextButton = document.getElementById('next-question');
+                const submitButton = document.getElementById('submit-quiz');
+                const progressText = document.getElementById('question-progress');
+                
+                progressText.textContent = `第 ${currentQuestionIndex + 1} 題 / 共 ${questions.length} 題`;
+                
+                // 按鈕狀態控制
+                if (currentQuestionIndex === 0) {
+                    prevButton.disabled = true;
+                    prevButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    prevButton.disabled = false;
+                    prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                
+                if (currentQuestionIndex === questions.length - 1) {
+                    nextButton.classList.add('hidden');
+                    submitButton.classList.remove('hidden');
+                } else {
+                    nextButton.classList.remove('hidden');
+                    submitButton.classList.add('hidden');
+                }
+                
+                // 構建題目 HTML
+                let partsHtml = '';
+                if (!userAnswers[currentQuestionIndex]) {
+                    userAnswers[currentQuestionIndex] = {};
+                }
+                
+                question.parts.forEach((part, index) => {
+                    const savedAnswer = userAnswers[currentQuestionIndex][index] || '';
+                    const keyboardHtml = getInlineKeyboardHtml(currentQuestionIndex, index);
+                    
+                    partsHtml += `
+                        <div class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="font-bold text-lg mb-2 text-primary-color">${part.label}</div>
+                            <div class="mb-3 text-lg">${part.question}</div>
+                            
+                            <label class="block text-gray-700 font-medium mb-1 text-sm">答案:</label>
+                            <div class="flex flex-col">
+                                <input type="text" 
+                                    readonly
+                                    class="answer-input" 
+                                    id="answer-${currentQuestionIndex}-${index}" 
+                                    data-question="${currentQuestionIndex}" 
+                                    data-part="${index}"
+                                    value="${savedAnswer}" 
+                                    placeholder="請使用下方按鈕輸入">
+                                <div class="answer-preview" id="preview-${currentQuestionIndex}-${index}">
+                                    <span class="preview-label">預覽</span>
+                                </div>
+                                
+                                <!-- 嵌入式鍵盤 -->
+                                ${keyboardHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                questionContainer.innerHTML = `
+                    <div class="mb-4 relative">
+                        <div class="question-number">${currentQuestionIndex + 1}</div>
+                        <h3 class="question-title text-xl font-bold pl-6">因式分解</h3>
+                    </div>
+                    <div class="mt-4">
+                        ${partsHtml}
+                    </div>
+                `;
+                
+                MathJax.typeset([questionContainer]);
+                
+                // 更新預覽
+                question.parts.forEach((part, index) => {
+                    const inputField = document.getElementById(`answer-${currentQuestionIndex}-${index}`);
+                    const previewDiv = document.getElementById(`preview-${currentQuestionIndex}-${index}`);
+                    if (userAnswers[currentQuestionIndex][index]) {
+                        updatePreview(userAnswers[currentQuestionIndex][index], previewDiv);
+                    }
+                    
+                    // 點擊輸入框時高亮
+                    inputField.addEventListener('click', function() {
+                        document.querySelectorAll('.answer-input').forEach(el => el.classList.remove('input-active'));
+                        this.classList.add('input-active');
+                    });
+                });
+            }
+            
+            function updatePreview(value, previewDiv) {
+                if (!value) {
+                    previewDiv.innerHTML = '<span class="preview-label">預覽</span>';
+                    return;
+                }
+                let formattedValue = value;
+                // 處理指數顯示
+                formattedValue = formattedValue.replace(/\^(\d+)/g, '^{$1}');
+                formattedValue = formattedValue.replace(/\^-(\d+)/g, '^{-$1}');
+                
+                // 簡單的 LaTeX 格式化
+                formattedValue = formattedValue.replace(/\*/g, '');
+                
+                previewDiv.innerHTML = '<span class="preview-label">預覽</span>\\(' + formattedValue + '\\)';
+                MathJax.typeset([previewDiv]);
+            }
+            
+            function showResults() {
+                const quizContainer = document.getElementById('quiz-container');
+                const resultsContainer = document.getElementById('results-container');
+                const scoreElement = document.getElementById('score');
+                const totalScoreElement = document.getElementById('total-score');
+                const detailedResults = document.getElementById('detailed-results');
+                
+                let score = 0;
+                let totalParts = 0;
+                
+                detailedResults.innerHTML = '';
+                
+                questions.forEach((question, qIndex) => {
+                    const questionCard = document.createElement('div');
+                    questionCard.className = 'result-card shadow-md';
+                    
+                    let partsResultHtml = '';
+                    
+                    question.parts.forEach((part, pIndex) => {
+                        totalParts++;
+                        const userAnswer = (userAnswers[qIndex] && userAnswers[qIndex][pIndex]) || '';
+                        const isCorrect = checkAnswer(userAnswer, part.correctAnswers);
+                        
+                        if (isCorrect) score++;
+                        
+                        let formattedUserAnswer = userAnswer || '未作答';
+                        if (userAnswer) {
+                            formattedUserAnswer = formattedUserAnswer.replace(/\^(\d+)/g, '^{$1}');
+                        }
+                        
+                        partsResultHtml += `
+                            <div class="part-result">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-bold text-gray-700">${part.label}</span>
+                                    <span class="status-badge ${isCorrect ? 'status-correct' : 'status-wrong'}">
+                                        ${isCorrect ? '正確' : '錯誤'}
+                                    </span>
+                                </div>
+                                <div class="mb-2 text-sm">${part.question}</div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <div class="result-label">你的答案:</div>
+                                        <div class="result-answer">\\(${formattedUserAnswer}\\)</div>
+                                    </div>
+                                    <div>
+                                        <div class="result-label">參考答案:</div>
+                                        <div class="result-answer">\\(${part.answer}\\)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    questionCard.innerHTML = `
+                        <div class="result-header">
+                            <h4 class="text-lg font-bold">第 ${qIndex + 1} 題</h4>
+                        </div>
+                        <div class="result-body">
+                            ${partsResultHtml}
+                        </div>
+                    `;
+                    
+                    detailedResults.appendChild(questionCard);
+                });
+                
+                scoreElement.textContent = score;
+                totalScoreElement.textContent = totalParts;
+                
+                MathJax.typeset([detailedResults]);
+                
+                quizContainer.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+            }
+            
+            function initQuiz() {
+                questions = generateQuestions();
+                currentQuestionIndex = 0;
+                userAnswers = []; // 重置答案
+                
+                renderQuestionNav();
+                renderCurrentQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
