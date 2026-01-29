@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陳老師的數學實驗室 | Math Lab</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50; /* 深藍色 - 學術感 */
+            --accent-color: #3498db;  /* 亮藍色 - 科技感 */
+            --dse-color: #f1c40f;     /* 金色 - DSE 重點 */
+            --grid-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Lato', 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
+            /* 數學方格紙背景效果 */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 100vh;
+        }
+
+        /* 頂部導航欄 */
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* 側邊篩選欄 */
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        .filter-group-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* 工具卡片設計 */
+        .tool-card {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: var(--accent-color);
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .card-title {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .card-meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .badge-grade {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        .badge-topic {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+            border: 1px solid #e1bee7;
+        }
+
+        /* DSE 專屬標記 */
+        .dse-ribbon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--dse-color);
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-bottom-left-radius: 10px;
+            box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .dse-icon {
+            color: #fff; 
+            margin-right: 3px;
+        }
+
+        /* 教師專用鎖定遮罩 */
+        .teacher-locked {
+            filter: grayscale(1);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* 教學裝飾元素 */
+        .math-deco {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fa-solid fa-square-root-variable me-2"></i>陳老師的數學實驗室
+            </a>
+            <div class="d-flex align-items-center">
+                <button id="authBtn" class="btn btn-outline-light btn-sm" onclick="toggleAuth()">
+                    <i class="fa-solid fa-user-tie me-1"></i> <span id="authText">教師登入</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <h4 id="welcomeMsg" class="mb-1">歡迎來到數學資源庫 👋</h4>
+                <p class="text-muted small">選擇下方的篩選條件找到適合的工具</p>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="搜尋工具名稱..." onkeyup="renderTools()">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="sidebar">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0"><i class="fa-solid fa-filter me-2"></i>篩選</h5>
+                        <button class="btn btn-sm btn-link text-decoration-none" onclick="resetFilters()">重置</button>
+                    </div>
+
+                    <div id="studentFilters">
+                        <div class="filter-group-title">年級</div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S1" onchange="renderTools()"> <label class="form-check-label">中一 (S1)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S2" onchange="renderTools()"> <label class="form-check-label">中二 (S2)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S3" onchange="renderTools()"> <label class="form-check-label">中三 (S3)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S4" onchange="renderTools()"> <label class="form-check-label">中四 (S4)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S5" onchange="renderTools()"> <label class="form-check-label">中五 (S5)</label></div>
+                        <div class="form-check"><input class="form-check-input filter-grade" type="checkbox" value="S6" onchange="renderTools()"> <label class="form-check-label">中六 (S6)</label></div>
+
+                        <div class="filter-group-title">課題</div>
+                        <select id="topicFilter" class="form-select form-select-sm" onchange="renderTools()">
+                            <option value="">所有課題</option>
+                            <option value="代數">代數 (Algebra)</option>
+                            <option value="幾何">幾何 (Geometry)</option>
+                            <option value="統計">統計 (Statistics)</option>
+                            <option value="概率">概率 (Probability)</option>
+                            <option value="微積分">微積分 (Calculus)</option>
+                        </select>
+
+                        <div class="filter-group-title">特殊標籤</div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="dseFilter" onchange="renderTools()">
+                            <label class="form-check-label text-warning fw-bold" for="dseFilter"><i class="fa-solid fa-star me-1"></i>只顯示 DSE 適用</label>
+                        </div>
+                    </div>
+
+                    <div id="teacherFilters" style="display: none;">
+                        <div class="filter-group-title text-danger">教師專用類別</div>
+                        <div class="form-check"><input class="form-check-input filter-type" type="checkbox" value="admin" onchange="renderTools()"> <label class="form-check-label">行政工具</label></div>
+                        <div class="form-check"><input class="form-check-input filter-type" type="checkbox" value="analysis" onchange="renderTools()"> <label class="form-check-label">數據分析</label></div>
+                        <div class="form-check"><input class="form-check-input filter-type" type="checkbox" value="interactive" onchange="renderTools()"> <label class="form-check-label">課室互動</label></div>
+                        <div class="form-check"><input class="form-check-input filter-type" type="checkbox" value="generator" onchange="renderTools()"> <label class="form-check-label">工作紙生成</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" id="toolsContainer">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------------------------------------------------------
+        // 1. 資料庫 (您可以隨時新增工具於此)
+        // ---------------------------------------------------------
+        const toolsData = [
+            // --- 學生及通用工具 ---
+            {
+                id: 1,
+                title: "二次方程計算機",
+                desc: "輸入係數 a, b, c 自動顯示判別式與根的詳細步驟。",
+                audience: ["student", "teacher"],
+                grades: ["S3", "S4"],
+                topic: "代數",
+                isDSE: true,
+                updateDate: "2024-01-15",
+                url: "./tools/quadratic/index.html"
+            },
+            {
+                id: 2,
+                title: "圓形幾何性質演示",
+                desc: "拖動圓上的點，觀察圓心角與圓周角的關係。",
+                audience: ["student", "teacher"],
+                grades: ["S4"],
+                topic: "幾何",
+                isDSE: true,
+                updateDate: "2024-02-10",
+                url: "./tools/circle-geo/index.html"
+            },
+            {
+                id: 3,
+                title: "初中整數加減練習",
+                desc: "無限生成有向數運算題目，適合初學者。",
+                audience: ["student"],
+                grades: ["S1"],
+                topic: "代數",
+                isDSE: false,
+                updateDate: "2023-11-05",
+                url: "./tools/integers/index.html"
+            },
+            // --- 教師專用工具 ---
+            {
+                id: 101,
+                title: "班級成績分佈分析器",
+                desc: "輸入全班分數，自動計算 SD 及繪製 Boxplot。",
+                audience: ["teacher"],
+                category: "analysis", // 對應 filter-type
+                updateDate: "2024-03-01",
+                url: "./tools/grade-analysis/index.html"
+            },
+            {
+                id: 102,
+                title: "工作紙 LaTeX 生成器",
+                desc: "快速將題目轉為 LaTeX 格式並輸出 PDF。",
+                audience: ["teacher"],
+                category: "generator",
+                updateDate: "2024-02-20",
+                url: "./tools/worksheet-gen/index.html"
+            }
+        ];
+
+        // ---------------------------------------------------------
+        // 2. 狀態管理
+        // ---------------------------------------------------------
+        let isTeacherMode = false; // 預設為學生模式
+
+        // ---------------------------------------------------------
+        // 3. 核心功能：渲染工具卡片
+        // ---------------------------------------------------------
+        function renderTools() {
+            const container = document.getElementById('toolsContainer');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            // 取得勾選的年級
+            const checkedGrades = Array.from(document.querySelectorAll('.filter-grade:checked')).map(cb => cb.value);
+            // 取得選中的課題
+            const selectedTopic = document.getElementById('topicFilter').value;
+            // 取得 DSE 開關
+            const isDSEOnly = document.getElementById('dseFilter').checked;
+            // 取得勾選的教師類別
+            const checkedTypes = Array.from(document.querySelectorAll('.filter-type:checked')).map(cb => cb.value);
+
+            container.innerHTML = ''; // 清空列表
+
+            // 過濾邏輯
+            const filtered = toolsData.filter(tool => {
+                // A. 搜尋關鍵字過濾
+                if (!tool.title.toLowerCase().includes(searchVal) && !tool.desc.toLowerCase().includes(searchVal)) return false;
+
+                // B. 權限過濾 (重點)
+                // 如果是學生模式，隱藏只有 "teacher" 的工具
+                if (!isTeacherMode && tool.audience.length === 1 && tool.audience[0] === 'teacher') return false;
+
+                // C. 標籤過濾 (僅對學生工具生效，除非是教師模式下查看學生工具)
+                if (tool.audience.includes('student')) {
+                    if (checkedGrades.length > 0) {
+                        // 檢查該工具的適用年級是否有任何一個在勾選名單中
+                        const hasMatch = tool.grades.some(g => checkedGrades.includes(g));
+                        if (!hasMatch) return false;
+                    }
+                    if (selectedTopic && tool.topic !== selectedTopic) return false;
+                    if (isDSEOnly && !tool.isDSE) return false;
+                }
+
+                // D. 教師類別過濾 (僅在教師模式下生效)
+                if (isTeacherMode && tool.audience.includes('teacher') && !tool.audience.includes('student')) {
+                     if (checkedTypes.length > 0 && !checkedTypes.includes(tool.category)) return false;
+                }
+
+                return true;
+            });
+
+            // 生成 HTML
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center text-muted py-5">找不到符合條件的工具 <i class="fa-regular fa-face-frown"></i></div>`;
+                return;
+            }
+
+            filtered.forEach(tool => {
+                // 判斷是否為教師專用
+                const isTeacherTool = tool.audience.length === 1 && tool.audience[0] === 'teacher';
+                
+                // 標籤顯示邏輯
+                let tagsHtml = '';
+                if (tool.grades) {
+                    tool.grades.forEach(g => tagsHtml += `<span class="badge badge-grade me-1">${g}</span>`);
+                }
+                if (tool.topic) {
+                    tagsHtml += `<span class="badge badge-topic me-1">${tool.topic}</span>`;
+                }
+                if (isTeacherTool) {
+                    tagsHtml += `<span class="badge bg-danger me-1"><i class="fa-solid fa-lock me-1"></i>教師專用</span>`;
+                    tagsHtml += `<span class="badge bg-secondary me-1">${tool.category || '一般'}</span>`;
+                }
+
+                // DSE 標籤 HTML
+                const dseBadge = tool.isDSE ? 
+                    `<div class="dse-ribbon"><i class="fa-solid fa-star dse-icon"></i>DSE 適用</div>` : '';
+
+                // 卡片 HTML
+                const cardHtml = `
+                    <div class="col">
+                        <div class="card tool-card h-100">
+                            ${dseBadge}
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${tool.title}</h5>
+                                <div class="mb-2">
+                                    ${tagsHtml}
+                                </div>
+                                <p class="card-text text-secondary flex-grow-1 small">${tool.desc}</p>
+                                <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i>${tool.updateDate}</small>
+                                    <a href="${tool.url}" class="btn btn-sm btn-${isTeacherTool ? 'danger' : 'primary'}">
+                                        開啟工具 <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // ---------------------------------------------------------
+        // 4. 模擬登入系統 (未來這裡連接 Firebase)
+        // ---------------------------------------------------------
+        function toggleAuth() {
+            // 切換狀態
+            isTeacherMode = !isTeacherMode;
+            
+            const btn = document.getElementById('authBtn');
+            const authText = document.getElementById('authText');
+            const welcomeMsg = document.getElementById('welcomeMsg');
+            const teacherFilters = document.getElementById('teacherFilters');
+            const studentFilters = document.getElementById('studentFilters');
+
+            if (isTeacherMode) {
+                // 登入後狀態
+                btn.classList.replace('btn-outline-light', 'btn-warning');
+                btn.innerHTML = `<i class="fa-solid fa-right-from-bracket me-1"></i> 登出`;
+                welcomeMsg.innerHTML = `歡迎回來，陳老師 <span class="badge bg-warning text-dark">教師模式</span>`;
+                teacherFilters.style.display = 'block';
+                // studentFilters.style.opacity = '0.5'; // 讓學生篩選變淡，或保持原樣
+            } else {
+                // 登出後狀態
+                btn.classList.replace('btn-warning', 'btn-outline-light');
+                btn.innerHTML = `<i class="fa-solid fa-user-tie me-1"></i> 教師登入`;
+                welcomeMsg.innerHTML = `歡迎來到數學資源庫 👋`;
+                teacherFilters.style.display = 'none';
+                studentFilters.style.opacity = '1';
+            }
+
+            // 重新渲染列表
+            renderTools();
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+            document.getElementById('searchInput').value = '';
+            document.getElementById('topicFilter').value = '';
+            renderTools();
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTools();
+        });
+
+    </script>
+</body>
+</html>
