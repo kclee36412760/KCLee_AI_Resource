@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>數學恆等式學習平台</title>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <!-- 移除 polyfill.io 以確保安全性，現代瀏覽器已支援 ES6 -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script>
         window.MathJax = {
@@ -64,7 +64,7 @@
             margin: 0;
         }
 
-        /* 主選單 */
+        /* 主選單 & 程度選單 */
         .main-menu {
             display: flex;
             justify-content: center;
@@ -91,6 +91,23 @@
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(33, 150, 243, 0.5);
             background: linear-gradient(135deg, #42a5f5, #1e88e5);
+        }
+        
+        /* 程度選擇按鈕樣式 */
+        .level-button-basic {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+        }
+        .level-button-basic:hover {
+            background: linear-gradient(135deg, #81c784, #4caf50);
+            box-shadow: 0 15px 35px rgba(76, 175, 80, 0.5);
+        }
+
+        .level-button-advanced {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+        }
+        .level-button-advanced:hover {
+            background: linear-gradient(135deg, #e57373, #f44336);
+            box-shadow: 0 15px 35px rgba(244, 67, 54, 0.5);
         }
 
         /* 內容區域通用樣式 */
@@ -299,17 +316,36 @@
     <p class="subtitle">中二級 - 平方差與完全平方恆等式</p>
    </header>
 
+   <!-- 主選單：選擇恆等式 -->
    <div id="mainMenu" class="content-area active" style="text-align: center;">
-    <h2 style="color: #fff; margin-bottom: 30px;">請選擇學習模式</h2>
+    <h2 style="color: #fff; margin-bottom: 30px;">請選擇恆等式</h2>
     <div class="main-menu">
-        <button class="menu-button" onclick="startSection('difference')">
+        <button class="menu-button" onclick="showLevelMenu('difference')">
             平方差恆等式<br>
             <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">$(a+b)(a-b) = a^2-b^2$</span>
         </button> 
-        <button class="menu-button" onclick="startSection('perfectSquare')" style="background: linear-gradient(135deg, #ff9800, #f57c00);">
+        <button class="menu-button" onclick="showLevelMenu('perfectSquare')" style="background: linear-gradient(135deg, #ff9800, #f57c00);">
             完全平方恆等式<br>
             <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">$(a\pm b)^2 = a^2 \pm 2ab + b^2$</span>
         </button>
+    </div>
+   </div>
+
+   <!-- 程度選擇選單 -->
+   <div id="levelMenu" class="content-area" style="text-align: center;">
+    <h2 id="levelMenuTitle" style="color: #fff; margin-bottom: 30px;">請選擇挑戰程度</h2>
+    <div class="main-menu">
+        <button class="menu-button level-button-basic" onclick="startLevel('basic')">
+            初階挑戰 (Basic)<br>
+            <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">基礎運算 (5題)</span>
+        </button> 
+        <button class="menu-button level-button-advanced" onclick="startLevel('advanced')">
+            高階挑戰 (Advanced)<br>
+            <span style="font-size: 0.9rem; font-weight: normal; opacity: 0.8;">進階運算 (5題)</span>
+        </button>
+    </div>
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="back-button" onclick="showMainMenu()">返回主選單</button>
     </div>
    </div>
 
@@ -317,7 +353,7 @@
     <div class="example-header">
      <h2 id="exampleTitle" style="margin:0; color:#64b5f6;">例題學習</h2>
      <div style="background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px;">
-        例題 <span id="currentExampleNum">1</span> / <span id="totalExampleNum">10</span>
+        例題 <span id="currentExampleNum">1</span> / <span id="totalExampleNum">5</span>
      </div>
     </div>
 
@@ -333,14 +369,14 @@
         <button class="nav-button" id="nextExBtn" onclick="changeExample(1)">下一題</button>
     </div>
     <div style="text-align: center; margin-top: 20px;">
-        <button class="back-button" onclick="showMainMenu()">返回主選單</button>
+        <button class="back-button" onclick="showLevelMenu(currentMode)">返回程度選單</button>
     </div>
    </div>
 
    <div id="quizArea" class="content-area">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 id="quizTitle" style="margin:0; color:#ff9800;">測驗中</h2>
-        <span>題目 <span id="currentQuestionNum">1</span> / 10</span>
+        <span>題目 <span id="currentQuestionNum">1</span> / 5</span>
     </div>
 
     <div class="quiz-progress">
@@ -412,7 +448,7 @@
 
     <div class="action-buttons">
         <button class="submit-button" onclick="restartQuiz()">再試一次</button>
-        <button class="back-button" onclick="showMainMenu()">返回主選單</button>
+        <button class="back-button" onclick="showLevelMenu(currentMode)">返回程度選單</button>
     </div>
 
     <h3 style="margin-top: 40px; color: #64b5f6;">答題檢討</h3>
@@ -424,35 +460,39 @@
 
   <script>
     // --- 資料結構 ---
+    // 所有的題目與解答，根據題號分為 Basic (0-4) 與 Advanced (5-9)
     const examplesData = {
         difference: [
-            { q: "$(a+3)(a-3)$", a: "$(a+3)(a-3) = a^2 - 3^2 = a^2 - 9$" },
-            { q: "$(7+b)(7-b)$", a: "$(7+b)(7-b) = 7^2 - b^2 = 49 - b^2$" },
-            { q: "$(2a+3)(2a-3)$", a: "$(2a+3)(2a-3) = (2a)^2 - 3^2 = 4a^2 - 9$" },
-            { q: "$(4-5c)(4+5c)$", a: "$(4-5c)(4+5c) = 4^2 - (5c)^2 = 16 - 25c^2$" },
-            { q: "$(3x+4y)(3x-4y)$", a: "$(3x+4y)(3x-4y) = (3x)^2 - (4y)^2 = 9x^2 - 16y^2$" },
-            { q: "$(-m+3)(-m-3)$", a: "$(-m+3)(-m-3) = (-m)^2 - 3^2 = m^2 - 9$" },
-            { q: "$(-6x-y)(-6x+y)$", a: "$(-6x-y)(-6x+y) = (-6x)^2 - y^2 = 36x^2 - y^2$" },
-            { q: "$(9b-a)(a+9b)$", a: "重新排列：$(9b-a)(9b+a) = (9b)^2 - a^2 = 81b^2 - a^2$" },
-            { q: "$4(5a+7)(5a-7)$", a: "$4[(5a)^2 - 7^2] = 4(25a^2 - 49) = 100a^2 - 196$" },
-            { q: "$-5(8m+3n)(8m-3n)$", a: "$-5[(8m)^2 - (3n)^2] = -5(64m^2 - 9n^2) = -320m^2 + 45n^2$" }
+            { q: "$(a+3)(a-3)$", a: "$$ \\begin{align*} (a+3)(a-3) &= a^2 - 3^2 \\\\ &= a^2 - 9 \\end{align*} $$" },
+            { q: "$(7+b)(7-b)$", a: "$$ \\begin{align*} (7+b)(7-b) &= 7^2 - b^2 \\\\ &= 49 - b^2 \\end{align*} $$" },
+            { q: "$(2a+3)(2a-3)$", a: "$$ \\begin{align*} (2a+3)(2a-3) &= (2a)^2 - 3^2 \\\\ &= 4a^2 - 9 \\end{align*} $$" },
+            { q: "$(4-5c)(4+5c)$", a: "$$ \\begin{align*} (4-5c)(4+5c) &= 4^2 - (5c)^2 \\\\ &= 16 - 25c^2 \\end{align*} $$" },
+            { q: "$(3x+4y)(3x-4y)$", a: "$$ \\begin{align*} (3x+4y)(3x-4y) &= (3x)^2 - (4y)^2 \\\\ &= 9x^2 - 16y^2 \\end{align*} $$" },
+            // Advanced Starts
+            { q: "$(-m+3)(-m-3)$", a: "$$ \\begin{align*} (-m+3)(-m-3) &= (-m)^2 - 3^2 \\\\ &= m^2 - 9 \\end{align*} $$" },
+            { q: "$(-6x-y)(-6x+y)$", a: "$$ \\begin{align*} (-6x-y)(-6x+y) &= (-6x)^2 - y^2 \\\\ &= 36x^2 - y^2 \\end{align*} $$" },
+            { q: "$(9b-a)(a+9b)$", a: "重新排列：$$ \\begin{align*} (9b-a)(9b+a) &= (9b)^2 - a^2 \\\\ &= 81b^2 - a^2 \\end{align*} $$" },
+            { q: "$4(5a+7)(5a-7)$", a: "$$ \\begin{align*} 4(5a+7)(5a-7) &= 4[(5a)^2 - 7^2] \\\\ &= 4(25a^2 - 49) \\\\ &= 100a^2 - 196 \\end{align*} $$" },
+            { q: "$-5(8m+3n)(8m-3n)$", a: "$$ \\begin{align*} -5(8m+3n)(8m-3n) &= -5[(8m)^2 - (3n)^2] \\\\ &= -5(64m^2 - 9n^2) \\\\ &= -320m^2 + 45n^2 \\end{align*} $$" }
         ],
         perfectSquare: [
-            { q: "$(h+3)^2$", a: "$(h+3)^2 = h^2 + 2(h)(3) + 3^2 = h^2 + 6h + 9$" },
-            { q: "$(k-3)^2$", a: "$(k-3)^2 = k^2 - 2(k)(3) + 3^2 = k^2 - 6k + 9$" },
-            { q: "$(2a+5)^2$", a: "$(2a+5)^2 = (2a)^2 + 2(2a)(5) + 5^2 = 4a^2 + 20a + 25$" },
-            { q: "$(3n-7)^2$", a: "$(3n-7)^2 = (3n)^2 - 2(3n)(7) + 7^2 = 9n^2 - 42n + 49$" },
-            { q: "$(4+5d)^2$", a: "$(4+5d)^2 = 4^2 + 2(4)(5d) + (5d)^2 = 16 + 40d + 25d^2$" },
-            { q: "$(-9-2a)^2$", a: "視為 $-(9+2a)$ 的平方：$(9+2a)^2 = 81 + 36a + 4a^2$" },
-            { q: "$(3a+2b)^2$", a: "$(3a+2b)^2 = (3a)^2 + 2(3a)(2b) + (2b)^2 = 9a^2 + 12ab + 4b^2$" },
-            { q: "$(2x-3y)^2$", a: "$(2x-3y)^2 = (2x)^2 - 2(2x)(3y) + (3y)^2 = 4x^2 - 12xy + 9y^2$" },
-            { q: "$-(7-6b)^2$", a: "$- [7^2 - 2(7)(6b) + (6b)^2] = -(49 - 84b + 36b^2) = -49 + 84b - 36b^2$" },
-            { q: "$3(4m+n)^2$", a: "$3[(4m)^2 + 2(4m)(n) + n^2] = 3(16m^2 + 8mn + n^2) = 48m^2 + 24mn + 3n^2$" }
+            { q: "$(h+3)^2$", a: "$$ \\begin{align*} (h+3)^2 &= h^2 + 2(h)(3) + 3^2 \\\\ &= h^2 + 6h + 9 \\end{align*} $$" },
+            { q: "$(k-3)^2$", a: "$$ \\begin{align*} (k-3)^2 &= k^2 - 2(k)(3) + 3^2 \\\\ &= k^2 - 6k + 9 \\end{align*} $$" },
+            { q: "$(2a+5)^2$", a: "$$ \\begin{align*} (2a+5)^2 &= (2a)^2 + 2(2a)(5) + 5^2 \\\\ &= 4a^2 + 20a + 25 \\end{align*} $$" },
+            { q: "$(3n-7)^2$", a: "$$ \\begin{align*} (3n-7)^2 &= (3n)^2 - 2(3n)(7) + 7^2 \\\\ &= 9n^2 - 42n + 49 \\end{align*} $$" },
+            { q: "$(4+5d)^2$", a: "$$ \\begin{align*} (4+5d)^2 &= 4^2 + 2(4)(5d) + (5d)^2 \\\\ &= 16 + 40d + 25d^2 \\end{align*} $$" },
+            // Advanced Starts
+            { q: "$(-9-2a)^2$", a: "視為 $-(9+2a)$ 的平方： $$ \\begin{align*} (9+2a)^2 &= 9^2 + 2(9)(2a) + (2a)^2 \\\\ &= 81 + 36a + 4a^2 \\end{align*} $$" },
+            { q: "$(3a+2b)^2$", a: "$$ \\begin{align*} (3a+2b)^2 &= (3a)^2 + 2(3a)(2b) + (2b)^2 \\\\ &= 9a^2 + 12ab + 4b^2 \\end{align*} $$" },
+            { q: "$(2x-3y)^2$", a: "$$ \\begin{align*} (2x-3y)^2 &= (2x)^2 - 2(2x)(3y) + (3y)^2 \\\\ &= 4x^2 - 12xy + 9y^2 \\end{align*} $$" },
+            { q: "$-(7-6b)^2$", a: "$$ \\begin{align*} -(7-6b)^2 &= - [7^2 - 2(7)(6b) + (6b)^2] \\\\ &= -(49 - 84b + 36b^2) \\\\ &= -49 + 84b - 36b^2 \\end{align*} $$" },
+            { q: "$3(4m+n)^2$", a: "$$ \\begin{align*} 3(4m+n)^2 &= 3[(4m)^2 + 2(4m)(n) + n^2] \\\\ &= 3(16m^2 + 8mn + n^2) \\\\ &= 48m^2 + 24mn + 3n^2 \\end{align*} $$" }
         ]
     };
 
     // --- 全局變數 ---
     let currentMode = ''; 
+    let currentLevel = ''; // 'basic' or 'advanced'
     let currentExampleIndex = 0;
     
     // 測驗變數
@@ -463,26 +503,28 @@
     let quizState = 'answering'; 
     let userHistory = []; 
 
-    // --- 核心邏輯：從原版恢復的題目生成器 ---
-    function generateQuizQuestions(type) {
+    // --- 核心邏輯：題目生成器 ---
+    function generateQuizQuestions(type, level) {
         const questions = [];
         const variables = ['a', 'b', 'c', 'd', 'h', 'k', 'm', 'n', 'x', 'y'];
         
+        let patterns = [];
+
         if (type === 'difference') {
-            const patterns = [
-                // 1. (v+n)(v-n)
+            patterns = [
+                // 1. (v+n)(v-n) [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${v}+${n})(${v}-${n})`, a: `${v}^2-${n*n}` };
                 },
-                // 2. (n+v)(n-v)
+                // 2. (n+v)(n-v) [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${n}+${v})(${n}-${v})`, a: `${n*n}-${v}^2` };
                 },
-                // 3. (cv+n)(cv-n)
+                // 3. (cv+n)(cv-n) [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     let c = Math.floor(Math.random() * 8) + 2;
@@ -490,7 +532,7 @@
                     while (c === n) n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${c}${v}+${n})(${c}${v}-${n})`, a: `${c*c}${v}^2-${n*n}` };
                 },
-                // 4. (n-cv)(n+cv)
+                // 4. (n-cv)(n+cv) [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     let c = Math.floor(Math.random() * 8) + 2;
@@ -498,7 +540,7 @@
                     while (c === n) n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${n}-${c}${v})(${n}+${c}${v})`, a: `${n*n}-${c*c}${v}^2` };
                 },
-                // 5. (c1v1+c2v2)(c1v1-c2v2)
+                // 5. (c1v1+c2v2)(c1v1-c2v2) [Basic]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -508,13 +550,13 @@
                     while (c1 === c2) c2 = Math.floor(Math.random() * 8) + 2;
                     return { q: `(${c1}${v1}+${c2}${v2})(${c1}${v1}-${c2}${v2})`, a: `${c1*c1}${v1}^2-${c2*c2}${v2}^2` };
                 },
-                // 6. (-v+n)(-v-n)
+                // 6. (-v+n)(-v-n) [Advanced]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(-${v}+${n})(-${v}-${n})`, a: `${v}^2-${n*n}` };
                 },
-                // 7. (-cv1-v2)(-cv1+v2)
+                // 7. (-cv1-v2)(-cv1+v2) [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -522,7 +564,7 @@
                     const c = Math.floor(Math.random() * 8) + 2;
                     return { q: `(-${c}${v1}-${v2})(-${c}${v1}+${v2})`, a: `${c*c}${v1}^2-${v2}^2` };
                 },
-                // 8. (cv1-v2)(v2+cv1)
+                // 8. (cv1-v2)(v2+cv1) [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -530,7 +572,7 @@
                     const c = Math.floor(Math.random() * 8) + 2;
                     return { q: `(${c}${v1}-${v2})(${v2}+${c}${v1})`, a: `${c*c}${v1}^2-${v2}^2` };
                 },
-                // 9. k(cv+n)(cv-n)
+                // 9. k(cv+n)(cv-n) [Advanced]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const coeff = Math.floor(Math.random() * 5) + 2;
@@ -539,7 +581,7 @@
                     while (c === coeff) c = Math.floor(Math.random() * 8) + 2;
                     return { q: `${coeff}(${c}${v}+${n})(${c}${v}-${n})`, a: `${coeff*c*c}${v}^2-${coeff*n*n}` };
                 },
-                // 10. -k(c1v1+c2v2)(c1v1-c2v2)
+                // 10. -k(c1v1+c2v2)(c1v1-c2v2) [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -551,50 +593,49 @@
                     return { q: `-${coeff}(${c1}${v1}+${c2}${v2})(${c1}${v1}-${c2}${v2})`, a: `-${coeff*c1*c1}${v1}^2+${coeff*c2*c2}${v2}^2` };
                 }
             ];
-            for (let i = 0; i < 10; i++) questions.push(patterns[i]());
         } else {
-            const patterns = [
-                // 1. (v+n)^2
+            patterns = [
+                // 1. (v+n)^2 [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${v}+${n})^2`, a: `${v}^2+${2*n}${v}+${n*n}` };
                 },
-                // 2. (v-n)^2
+                // 2. (v-n)^2 [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${v}-${n})^2`, a: `${v}^2-${2*n}${v}+${n*n}` };
                 },
-                // 3. (cv+n)^2
+                // 3. (cv+n)^2 [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const c = Math.floor(Math.random() * 8) + 2;
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${c}${v}+${n})^2`, a: `${c*c}${v}^2+${2*c*n}${v}+${n*n}` };
                 },
-                // 4. (cv-n)^2
+                // 4. (cv-n)^2 [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const c = Math.floor(Math.random() * 8) + 2;
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${c}${v}-${n})^2`, a: `${c*c}${v}^2-${2*c*n}${v}+${n*n}` };
                 },
-                // 5. (n+cv)^2
+                // 5. (n+cv)^2 [Basic]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const c = Math.floor(Math.random() * 8) + 2;
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(${n}+${c}${v})^2`, a: `${n*n}+${2*n*c}${v}+${c*c}${v}^2` };
                 },
-                // 6. (-n-cv)^2
+                // 6. (-n-cv)^2 [Advanced]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const c = Math.floor(Math.random() * 8) + 2;
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `(-${n}-${c}${v})^2`, a: `${n*n}+${2*n*c}${v}+${c*c}${v}^2` };
                 },
-                // 7. (c1v1+c2v2)^2
+                // 7. (c1v1+c2v2)^2 [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -603,7 +644,7 @@
                     const c2 = Math.floor(Math.random() * 8) + 2;
                     return { q: `(${c1}${v1}+${c2}${v2})^2`, a: `${c1*c1}${v1}^2+${2*c1*c2}${v1}${v2}+${c2*c2}${v2}^2` };
                 },
-                // 8. (c1v1-c2v2)^2
+                // 8. (c1v1-c2v2)^2 [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -612,14 +653,14 @@
                     const c2 = Math.floor(Math.random() * 8) + 2;
                     return { q: `(${c1}${v1}-${c2}${v2})^2`, a: `${c1*c1}${v1}^2-${2*c1*c2}${v1}${v2}+${c2*c2}${v2}^2` };
                 },
-                // 9. -(n-cv)^2
+                // 9. -(n-cv)^2 [Advanced]
                 () => {
                     const v = variables[Math.floor(Math.random() * variables.length)];
                     const c = Math.floor(Math.random() * 8) + 2;
                     const n = Math.floor(Math.random() * 9) + 2;
                     return { q: `-(${n}-${c}${v})^2`, a: `-${n*n}+${2*n*c}${v}-${c*c}${v}^2` };
                 },
-                // 10. k(c1v1+v2)^2
+                // 10. k(c1v1+v2)^2 [Advanced]
                 () => {
                     const v1 = variables[Math.floor(Math.random() * variables.length)];
                     let v2 = variables[Math.floor(Math.random() * variables.length)];
@@ -629,8 +670,16 @@
                     return { q: `${coeff}(${c}${v1}+${v2})^2`, a: `${coeff*c*c}${v1}^2+${coeff*2*c}${v1}${v2}+${coeff}${v2}^2` };
                 }
             ];
-            for (let i = 0; i < 10; i++) questions.push(patterns[i]());
         }
+
+        // 根據難度決定題目範圍
+        const start = level === 'basic' ? 0 : 5;
+        const end = level === 'basic' ? 5 : 10;
+        
+        for (let i = start; i < end; i++) {
+            questions.push(patterns[i]());
+        }
+        
         return questions;
     }
 
@@ -741,9 +790,6 @@
 
     function checkAnswer(user, correct) {
         if (normalizeExpression(user) === normalizeExpression(correct)) return true;
-        // 額外檢查：交換律等價形式 (針對簡單情況)
-        // 注意：原版的 compareAnswers 更複雜，這裡為了保持 UI 響應速度，
-        // 我們依賴 normalizeExpression 的強大排序功能已經能處理大部分情況 (a+b vs b+a)。
         return false;
     }
 
@@ -757,20 +803,37 @@
         document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
     }
 
-    function startSection(mode) {
+    function showLevelMenu(mode) {
         currentMode = mode;
+        hideAllSections();
+        document.getElementById('levelMenu').classList.add('active');
+        
+        const modeName = mode === 'difference' ? '平方差恆等式' : '完全平方恆等式';
+        document.getElementById('levelMenuTitle').innerHTML = `請選擇挑戰程度<br><span style="font-size:1.2rem; color:#b0bec5">${modeName}</span>`;
+    }
+
+    function startLevel(level) {
+        currentLevel = level;
         currentExampleIndex = 0;
         
         hideAllSections();
         document.getElementById('exampleArea').classList.add('active');
-        document.getElementById('exampleTitle').textContent = 
-            mode === 'difference' ? '平方差恆等式 - 例題' : '完全平方恆等式 - 例題';
+        
+        const modeName = currentMode === 'difference' ? '平方差恆等式' : '完全平方恆等式';
+        const levelName = currentLevel === 'basic' ? '初階' : '高階';
+        document.getElementById('exampleTitle').textContent = `${modeName} - ${levelName}例題`;
         
         renderExample();
     }
 
+    function getExampleList() {
+        const fullList = examplesData[currentMode];
+        if (currentLevel === 'basic') return fullList.slice(0, 5);
+        return fullList.slice(5, 10);
+    }
+
     function renderExample() {
-        const list = examplesData[currentMode];
+        const list = getExampleList();
         const ex = list[currentExampleIndex];
         
         document.getElementById('currentExampleNum').textContent = currentExampleIndex + 1;
@@ -789,7 +852,7 @@
     }
 
     function changeExample(delta) {
-        const list = examplesData[currentMode];
+        const list = getExampleList();
         const newIndex = currentExampleIndex + delta;
         if (newIndex >= 0 && newIndex < list.length) {
             currentExampleIndex = newIndex;
@@ -798,15 +861,18 @@
     }
 
     function switchToQuiz() {
-        // 使用恢復後的原版生成邏輯
-        quizQuestions = generateQuizQuestions(currentMode);
+        // 生成對應程度的題目 (5題)
+        quizQuestions = generateQuizQuestions(currentMode, currentLevel);
         currentQuestionIndex = 0;
         userScore = 0;
         userHistory = [];
         
         hideAllSections();
         document.getElementById('quizArea').classList.add('active');
-        document.getElementById('quizTitle').textContent = currentMode === 'difference' ? '平方差測驗' : '完全平方測驗';
+        
+        const modeName = currentMode === 'difference' ? '平方差' : '完全平方';
+        const levelName = currentLevel === 'basic' ? '初階' : '高階';
+        document.getElementById('quizTitle').textContent = `${modeName}${levelName}測驗`;
         
         loadQuestion();
     }
@@ -828,10 +894,10 @@
         actionBtn.style.background = '';
 
         document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
-        document.getElementById('progressBar').style.width = `${((currentQuestionIndex)/10)*100}%`;
+        // 進度條分為 5 等份
+        document.getElementById('progressBar').style.width = `${((currentQuestionIndex)/5)*100}%`;
         
         const qEl = document.getElementById('quizQuestion');
-        // 原版題目字符串已經包含 $, 這裡直接加 "展開 "
         qEl.innerHTML = `展開 $${q.q}$`;
         if (window.MathJax) MathJax.typesetPromise([qEl]);
     }
@@ -868,7 +934,6 @@
         if (!currentInput.trim()) return;
 
         const correctAnswer = quizQuestions[currentQuestionIndex].a;
-        // 使用恢復後的原版檢查邏輯
         const isCorrect = checkAnswer(currentInput, correctAnswer);
         
         userHistory.push({
@@ -884,7 +949,8 @@
 
         quizState = 'reviewing';
         const actionBtn = document.getElementById('quizActionBtn');
-        actionBtn.textContent = (currentQuestionIndex < 9) ? '下一題' : '查看結果';
+        // 共 5 題，最後一題 (index 4) 時按鈕變為查看結果
+        actionBtn.textContent = (currentQuestionIndex < 4) ? '下一題' : '查看結果';
         actionBtn.style.background = isCorrect ? '#4caf50' : '#607d8b';
         
         document.getElementById('inputArea').style.pointerEvents = 'none';
@@ -911,7 +977,7 @@
 
     function nextQuestion() {
         currentQuestionIndex++;
-        if (currentQuestionIndex < 10) {
+        if (currentQuestionIndex < 5) {
             loadQuestion();
         } else {
             showResultPage();
@@ -920,7 +986,7 @@
 
     function confirmQuitQuiz() {
         if (confirm("確定要退出測驗嗎？目前的進度將會遺失。")) {
-            showMainMenu();
+            showLevelMenu(currentMode);
         }
     }
 
@@ -928,7 +994,8 @@
         hideAllSections();
         document.getElementById('resultArea').classList.add('active');
         
-        const finalScore = userScore * 10;
+        // 5題，每題20分
+        const finalScore = userScore * 20;
         document.getElementById('finalScore').textContent = `${finalScore}分`;
         
         let comment = '';
