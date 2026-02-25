@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中一數學：一元一次方程大挑戰</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #FDFBF7;
+            color: #1e293b;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230f172a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar for Leaderboard */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- Background -->
+    <div class="fixed inset-0 bg-pattern pointer-events-none z-0"></div>
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white border-b-4 border-amber-500 shadow-xl relative z-10">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500 p-2 rounded-lg text-slate-900">
+                    <i data-lucide="sigma" class="w-6 h-6 stroke-[3]"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">中一數學：一元一次方程大挑戰</h1>
+                    <div class="text-xs text-amber-400 tracking-widest uppercase opacity-80">Secondary 1 Mathematics Competition</div>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-4 text-sm text-slate-300">
+                <span>解難</span><span>•</span><span>邏輯</span><span>•</span><span>速度</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app-container" class="container mx-auto p-4 md:p-8 max-w-5xl relative z-10">
+        <!-- Dynamic Content will be injected here -->
+        <div class="flex justify-center items-center h-64">
+            <div class="animate-spin text-amber-600">
+                <i data-lucide="loader-2" class="w-8 h-8"></i>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script type="module">
+        // --- Firebase Imports (Version 12.9.0) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRsxVdrXj8iUOmVW-ZCd9PQJfhydWwWo8",
+            authDomain: "s1-solving-linear-equation.firebaseapp.com",
+            projectId: "s1-solving-linear-equation",
+            storageBucket: "s1-solving-linear-equation.firebasestorage.app",
+            messagingSenderId: "660220858323",
+            appId: "1:660220858323:web:434a72a25d5bb7053de926",
+            measurementId: "G-KKQ5QK6NV2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Game State ---
+        const state = {
+            view: 'welcome', // welcome, playing, result
+            difficulty: 'beginner', // for the game
+            leaderboardView: 'beginner', // for the leaderboard filter
+            leaderboardRoleFilter: 'all', 
+            questions: [],
+            currentQIndex: 0,
+            score: 0,
+            timer: 0,
+            timerInterval: null,
+            leaderboardData: [],
+            authReady: false,
+            totalQuestions: {
+                'beginner': 12,
+                'intermediate': 10,
+                'advanced': 8
+            }
+        };
+
+        // --- Auth Listener ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User signed in:", user.uid);
+                state.authReady = true;
+                fetchLeaderboard();
+            } else {
+                signInAnonymously(auth).catch(error => {
+                    console.error("Auth Error:", error);
+                });
+            }
+        });
+
+        // --- Math Generation Logic ---
+        const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        
+        // Ensure strictly no specific numbers
+        const getComplexCoefficient = (min, max, exclude = [0, 1, -1]) => {
+            let num = 0;
+            while (exclude.includes(num)) {
+                num = getRandomInt(min, max);
+            }
+            return num;
+        };
+
+        // Ensure variables or constants aren't conceptually too simple
+        const isTooSimple = (n) => [0, 1, -1].includes(n);
+
+        const formatSignedConst = (val) => {
+            if (val === 0) return "";
+            return val > 0 ? `+ ${val}` : `- ${Math.abs(val)}`;
+        };
+
+        // --- Generate Question with Type Control ---
+        const generateQuestion = (difficulty, specificType = null) => {
+            let latex = "";
+            let answer = 0;
+            const variables = ['x', 'y', 'a', 'b', 'k', 'm', 'n'];
+            const variable = variables[Math.floor(Math.random() * variables.length)];
+            
+            // Exclude 0, 1, -1 from answers
+            const range = difficulty === 'beginner' ? 10 : 15;
+            answer = getComplexCoefficient(-range, range, [0, 1, -1]); 
+
+            let type = specificType || 1; 
+
+            // ================== BEGINNER (12 Types) ==================
+            if (difficulty === 'beginner') {
+                if (!specificType) type = getRandomInt(1, 12);
+
+                if (type === 1) { 
+                    // ax = b
+                    const a = getComplexCoefficient(-12, 12, [0, 1, -1]);
+                    const b = a * answer;
+                    latex = `${a}${variable} = ${b}`;
+                } else if (type === 2) {
+                    // x + a = b
+                    let a, b;
+                    do {
+                        a = getComplexCoefficient(-30, 30, [0, 1, -1]);
+                        b = answer + a;
+                    } while (isTooSimple(b));
+                    latex = `${variable} ${formatSignedConst(a)} = ${b}`;
+                } else if (type === 3) {
+                    // x - a = b (Force 'a' positive to show visual minus)
+                    let a, b;
+                    do {
+                        a = getComplexCoefficient(2, 30, [0, 1, -1]);
+                        b = answer - a;
+                    } while (isTooSimple(b));
+                    latex = `${variable} - ${a} = ${b}`;
+                } else if (type === 4) {
+                    // a + x = b
+                    let a, b;
+                    do {
+                        a = getComplexCoefficient(-30, 30, [0, 1, -1]);
+                        b = a + answer;
+                    } while (isTooSimple(b));
+                    latex = `${a} + ${variable} = ${b}`;
+                } else if (type === 5) {
+                    // ax + b = c
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(-9, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(-20, 20, [0, 1, -1]); 
+                        c = (a * answer) + b;
+                    } while (isTooSimple(c));
+                    latex = `${a}${variable} ${formatSignedConst(b)} = ${c}`;
+                } else if (type === 6) {
+                    // ax - b = c 
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(-9, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 20, [0, 1, -1]); 
+                        c = (a * answer) - b;
+                    } while (isTooSimple(c));
+                    latex = `${a}${variable} - ${b} = ${c}`;
+                } else if (type === 7) {
+                    // b + ax = c
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(-9, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(-20, 20, [0, 1, -1]);
+                        c = b + (a * answer);
+                    } while (isTooSimple(c));
+                    latex = `${b} ${a > 0 ? '+' : '-'} ${Math.abs(a)}${variable} = ${c}`;
+                } else if (type === 8) {
+                    // b - ax = c
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(2, 9, [0, 1, -1]); 
+                        b = getComplexCoefficient(-20, 20, [0, 1, -1]);
+                        c = b - (a * answer);
+                    } while (isTooSimple(c));
+                    latex = `${b} - ${a}${variable} = ${c}`;
+                } else if (type === 9) {
+                    // ax + bx = c (Combine)
+                    let a, b, sum, c, secondTerm, sign;
+                    do {
+                        a = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 9, [0, 1, -1]); 
+                        sum = a + (Math.random() > 0.5 ? b : -b);
+                        c = sum * answer;
+                        secondTerm = sum - a;
+                    } while (isTooSimple(sum) || isTooSimple(c) || isTooSimple(secondTerm));
+                    sign = secondTerm > 0 ? '+' : '-';
+                    latex = `${a}${variable} ${sign} ${Math.abs(secondTerm)}${variable} = ${c}`;
+                } else if (type === 10) {
+                    // ax - bx = c (Explicit subtraction combine)
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(4, 12, [0, 1, -1]);
+                        b = getComplexCoefficient(2, a-2, [0, 1, -1]); // Ensure difference >= 2
+                        c = (a - b) * answer;
+                    } while (isTooSimple(c) || isTooSimple(a - b));
+                    latex = `${a}${variable} - ${b}${variable} = ${c}`;
+                } else if (type === 11) {
+                    // ax = bx + c
+                    let a, b, c;
+                    do {
+                        b = getComplexCoefficient(-9, 9, [0, 1, -1]);
+                        a = getComplexCoefficient(-9, 9, [0, 1, -1, b, b+1, b-1]); 
+                        c = (a - b) * answer;
+                    } while (isTooSimple(c) || isTooSimple(a - b));
+                    latex = `${a}${variable} = ${b}${variable} ${formatSignedConst(c)}`;
+                } else if (type === 12) {
+                    // x / a = b
+                    let a, b;
+                    let valid = false, attempts = 0;
+                    while(!valid && attempts < 30) {
+                        a = getComplexCoefficient(-12, 12, [0, 1, -1]);
+                        if (answer % a === 0) {
+                            b = answer / a;
+                            if (!isTooSimple(b)) valid = true;
+                        }
+                        attempts++;
+                    }
+                    if (!valid) { a = 2; answer = 4; b = 2; }
+                    latex = `\\frac{${variable}}{${a}} = ${b}`;
+                }
+
+            // ================== INTERMEDIATE (8 Types) ==================
+            } else if (difficulty === 'intermediate') {
+                if (!specificType) type = getRandomInt(1, 8);
+
+                if (type === 1) {
+                    // a(x+b) = c
+                    let a, b, c;
+                    do {
+                        a = getComplexCoefficient(-8, 8, [0, 1, -1]);
+                        b = getComplexCoefficient(-15, 15, [0, 1, -1]);
+                        c = a * (answer + b);
+                    } while (isTooSimple(c));
+                    latex = `${a}(${variable} ${formatSignedConst(b)}) = ${c}`;
+                } else if (type === 2) {
+                    // a(bx+c) = d 
+                    let a, b, c, d;
+                    do {
+                        a = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        c = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                        d = a * (b * answer + c);
+                    } while (isTooSimple(d));
+                    latex = `${a}(${b}${variable} ${formatSignedConst(c)}) = ${d}`;
+                } else if (type === 3) {
+                    // ax + b = cx + d
+                    let a, b, c, d;
+                    do {
+                        a = getComplexCoefficient(-9, 9, [0, 1, -1]);
+                        c = getComplexCoefficient(-9, 9, [0, 1, -1, a, a-1, a+1]);
+                        b = getComplexCoefficient(-30, 30, [0, 1, -1]);
+                        d = (a * answer) + b - (c * answer);
+                    } while (isTooSimple(d));
+                    latex = `${a}${variable} ${formatSignedConst(b)} = ${c}${variable} ${formatSignedConst(d)}`;
+                } else if (type === 4) {
+                    // ax + b(x+c) = d
+                    let a, b, c, d;
+                    do {
+                        a = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 9, [0, 1, -1]); 
+                        c = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                        d = (a * answer) + b * (answer + c);
+                    } while (isTooSimple(d) || isTooSimple(a+b));
+                    latex = `${a}${variable} + ${b}(${variable} ${formatSignedConst(c)}) = ${d}`;
+                } else if (type === 5) {
+                    // ax - b(x+c) = d
+                    let a, b, c, d;
+                    do {
+                        a = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 9, [0, 1, -1, a, a+1, a-1]); // Avoid variables cancelling out
+                        c = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                        d = (a * answer) - b * (answer + c);
+                    } while (isTooSimple(d) || isTooSimple(a-b));
+                    latex = `${a}${variable} - ${b}(${variable} ${formatSignedConst(c)}) = ${d}`;
+                } else if (type === 6) {
+                    // (x+a)/b = c
+                    let a, b, c;
+                    do {
+                        b = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        c = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                        a = (b * c) - answer;
+                    } while (isTooSimple(a));
+                    latex = `\\frac{${variable} ${formatSignedConst(a)}}{${b}} = ${c}`;
+                } else if (type === 7) {
+                    // x/a + b = c
+                    let a, b, c;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 50) {
+                        a = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        if (answer % a === 0) {
+                            b = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                            c = (answer / a) + b;
+                            if (!isTooSimple(c)) valid = true;
+                        }
+                        attempts++;
+                    }
+                    if (!valid) { a=2; answer=4; b=3; c=5; } 
+                    latex = `\\frac{${variable}}{${a}} ${formatSignedConst(b)} = ${c}`;
+                } else if (type === 8) {
+                    // a(x+b) = c(x+d)
+                    let a, b_try, c, d;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        a = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        c = getComplexCoefficient(2, 5, [0, 1, -1, a, a+1, a-1]);
+                        b_try = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                        const lhs = a * (answer + b_try);
+                        if (lhs % c === 0) {
+                            d = (lhs / c) - answer;
+                            if (!isTooSimple(d)) valid = true;
+                        }
+                        attempts++;
+                    }
+                    if (!valid) { a=2; b_try=3; c=3; d=1; answer=3; } 
+                    latex = `${a}(${variable} ${formatSignedConst(b_try)}) = ${c}(${variable} ${formatSignedConst(d)})`;
+                }
+
+            // ================== ADVANCED (8 Types) ==================
+            } else { 
+                if (!specificType) type = getRandomInt(1, 8);
+
+                if (type === 1) {
+                    // (ax+b)/c = d
+                    let a, b, c, d;
+                    do {
+                        c = getComplexCoefficient(2, 9, [0, 1, -1]);
+                        d = getComplexCoefficient(-10, 10, [0, 1, -1]);
+                        a = getComplexCoefficient(-8, 8, [0, 1, -1]);
+                        b = (c * d) - (a * answer);
+                    } while (isTooSimple(b));
+                    latex = `\\frac{${a}${variable} ${formatSignedConst(b)}}{${c}} = ${d}`;
+                } else if (type === 2) {
+                    // x/a + x/b = c
+                    let a, b, c;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 50) {
+                        a = getComplexCoefficient(2, 6, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 6, [0, 1, -1, a, -a]);
+                        if (answer % a === 0 && answer % b === 0) {
+                            c = (answer / a) + (answer / b);
+                            if (!isTooSimple(c)) valid = true;
+                        }
+                        attempts++;
+                    }
+                    if (!valid) {
+                        a = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        b = getComplexCoefficient(2, 5, [0, 1, -1, a, -a]);
+                        answer = a * b * (Math.random()>0.5?2:-2);
+                        c = (answer/a) + (answer/b);
+                    }
+                    latex = `\\frac{${variable}}{${a}} + \\frac{${variable}}{${b}} = ${c}`;
+                } else if (type === 3) {
+                    // (x+a)/b = (x+c)/d
+                    let a, b, c_val, d, k;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        b = getComplexCoefficient(2, 6, [0, 1, -1]);
+                        d = getComplexCoefficient(2, 6, [0, 1, -1, b, -b]);
+                        k = getComplexCoefficient(-3, 3, [0, 1, -1]);
+                        a = k * b - answer;
+                        c_val = k * d - answer;
+                        if (!isTooSimple(a) && !isTooSimple(c_val)) valid = true;
+                        attempts++;
+                    }
+                    if (!valid) { b=2; d=3; k=2; answer=2; a=2; c_val=4; }
+                    latex = `\\frac{${variable} ${formatSignedConst(a)}}{${b}} = \\frac{${variable} ${formatSignedConst(c_val)}}{${d}}`;
+
+                } else if (type === 4) {
+                    // a[b(x+c) + d] = e
+                    let a, b, c, d, e;
+                    do {
+                        b = getComplexCoefficient(-4, 4, [0, 1, -1]);
+                        c = getComplexCoefficient(-5, 5, [0, 1, -1]); 
+                        d = getComplexCoefficient(-10, 10, [0, 1, -1]); 
+                        a = getComplexCoefficient(-3, 3, [0, 1, -1]); 
+                        e = a * (b * (answer + c) + d);
+                    } while (isTooSimple(e));
+                    latex = `${a}[${b}(${variable} ${formatSignedConst(c)}) ${formatSignedConst(d)}] = ${e}`;
+                } else if (type === 5) {
+                    // (x+a)/b + (x+c)/d = e
+                    let a, b, c_val, d, e;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        b = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        d = getComplexCoefficient(2, 5, [0, 1, -1, b, -b]);
+                        let k1 = getComplexCoefficient(-3, 3, [0, 1, -1]);
+                        let k2 = getComplexCoefficient(-3, 3, [0, 1, -1]);
+                        e = k1 + k2;
+                        a = k1 * b - answer;
+                        c_val = k2 * d - answer;
+                        if (!isTooSimple(a) && !isTooSimple(c_val) && !isTooSimple(e)) valid = true;
+                        attempts++;
+                    }
+                    if (!valid) { b=2; d=3; answer=2; a=2; c_val=4; e=4; }
+                    latex = `\\frac{${variable} ${formatSignedConst(a)}}{${b}} + \\frac{${variable} ${formatSignedConst(c_val)}}{${d}} = ${e}`;
+                } else if (type === 6) {
+                    // (ax+b)/c = (dx+e)/f
+                    let a, b, c, d_val, e_val, f;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        c = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        f = getComplexCoefficient(2, 5, [0, 1, -1, c, -c]);
+                        let k = getComplexCoefficient(-3, 3, [0, 1, -1]);
+                        let num1 = k * c;
+                        let num2 = k * f;
+                        a = getComplexCoefficient(2, 4, [0, 1, -1]);
+                        d_val = getComplexCoefficient(2, 4, [0, 1, -1, a]);
+                        b = num1 - a * answer;
+                        e_val = num2 - d_val * answer;
+                        if (!isTooSimple(b) && !isTooSimple(e_val)) valid = true;
+                        attempts++;
+                    }
+                    if (!valid) { c=2; f=3; a=2; b=2; d_val=3; e_val=3; answer=2; }
+                    latex = `\\frac{${a}${variable} ${formatSignedConst(b)}}{${c}} = \\frac{${d_val}${variable} ${formatSignedConst(e_val)}}{${f}}`;
+                } else if (type === 7) {
+                    // x/a + (x+b)/c = d
+                    let a, b, c, d;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        a = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                        if (answer % a === 0) {
+                            c = getComplexCoefficient(-5, 5, [0, 1, -1, a, -a]);
+                            let m = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                            b = m * c - answer;
+                            d = (answer / a) + m;
+                            if (!isTooSimple(b) && !isTooSimple(d)) valid = true;
+                        }
+                        attempts++;
+                    }
+                    if (!valid) { a=2; answer=6; c=3; b=3; d=6; }
+                    latex = `\\frac{${variable}}{${a}} + \\frac{${variable} ${formatSignedConst(b)}}{${c}} = ${d}`;
+                } else if (type === 8) {
+                    // a(x+b) + c(x+d) = e
+                    let a, b, c, d, e;
+                    let valid = false, attempts = 0;
+                    while (!valid && attempts < 100) {
+                        a = getComplexCoefficient(2, 5, [0, 1, -1]);
+                        c = getComplexCoefficient(2, 5, [0, 1, -1, -a]);
+                        b = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                        d = getComplexCoefficient(-5, 5, [0, 1, -1]);
+                        e = a * (answer + b) + c * (answer + d);
+                        if (!isTooSimple(e)) valid = true;
+                        attempts++;
+                    }
+                    if (!valid) { a=2; b=3; c=3; d=2; e=22; answer=2; }
+                    latex = `${a}(${variable} ${formatSignedConst(b)}) + ${c}(${variable} ${formatSignedConst(d)}) = ${e}`;
+                }
+            }
+            return { id: Math.random(), latex, correctAnswer: answer, variable };
+        };
+
+        // --- Functions ---
+
+        async function fetchLeaderboard() {
+            if (!state.authReady) return; 
+
+            try {
+                const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(300));
+                const querySnapshot = await getDocs(q);
+                let rawData = [];
+                querySnapshot.forEach((doc) => {
+                    rawData.push(doc.data());
+                });
+
+                const processedMap = {};
+
+                rawData.forEach(entry => {
+                    let userKey = "";
+                    if (entry.role === 'teacher') {
+                        userKey = `teacher_${entry.name}`;
+                    } else {
+                        userKey = `student_${entry.year}_${entry.classVal}_${entry.classNum}_${entry.name}`;
+                    }
+
+                    const mapKey = `${userKey}_${entry.difficulty}`;
+
+                    if (!processedMap[mapKey]) {
+                        processedMap[mapKey] = entry;
+                    } else {
+                        const existing = processedMap[mapKey];
+                        if (entry.score > existing.score) {
+                            processedMap[mapKey] = entry;
+                        } else if (entry.score === existing.score && entry.timeUsed < existing.timeUsed) {
+                            processedMap[mapKey] = entry;
+                        }
+                    }
+                });
+
+                state.leaderboardData = Object.values(processedMap);
+                renderApp();
+            } catch (e) {
+                console.error("Error fetching leaderboard: ", e);
+                renderApp();
+            }
+        }
+
+        function startGame() {
+            let qCount = state.totalQuestions[state.difficulty];
+            
+            let numTypes = 12;
+            if (state.difficulty === 'intermediate') numTypes = 8;
+            if (state.difficulty === 'advanced') numTypes = 8;
+
+            let typesPool = [];
+            
+            for (let i = 0; i < qCount; i++) {
+                typesPool.push((i % numTypes) + 1);
+            }
+            
+            for (let i = typesPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [typesPool[i], typesPool[j]] = [typesPool[j], typesPool[i]];
+            }
+
+            state.questions = typesPool.map(type => generateQuestion(state.difficulty, type));
+            
+            state.currentQIndex = 0;
+            state.score = 0;
+            state.timer = 0;
+            state.view = 'playing';
+            
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            state.timerInterval = setInterval(() => {
+                state.timer++;
+                const timerEl = document.getElementById('timer-display');
+                if (timerEl) {
+                    const mins = Math.floor(state.timer / 60).toString().padStart(2, '0');
+                    const secs = (state.timer % 60).toString().padStart(2, '0');
+                    timerEl.innerText = `${mins}:${secs}`;
+                }
+            }, 1000);
+
+            renderApp();
+        }
+
+        function submitAnswer(e) {
+            e.preventDefault();
+            const input = document.getElementById('answer-input');
+            const submitBtn = document.getElementById('submit-btn');
+            if (!input || input.disabled) return;
+
+            const val = parseInt(input.value.trim());
+            const currentQ = state.questions[state.currentQIndex];
+            
+            if (isNaN(val)) return;
+
+            input.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50');
+
+            const isCorrect = val === currentQ.correctAnswer;
+            const feedbackEl = document.getElementById('feedback-overlay');
+            
+            if (isCorrect) {
+                state.score += 10;
+                feedbackEl.innerHTML = `
+                    <div class="border-4 border-emerald-600 text-emerald-600 rounded-full w-40 h-40 flex flex-col items-center justify-center transform -rotate-12 shadow-xl bg-white">
+                        <i data-lucide="check-circle" class="w-12 h-12 mb-1"></i>
+                        <div class="text-2xl font-black font-serif uppercase tracking-widest">CORRECT</div>
+                    </div>
+                `;
+            } else {
+                feedbackEl.innerHTML = `
+                    <div class="border-4 border-red-600 text-red-600 rounded-full w-40 h-40 flex flex-col items-center justify-center transform -rotate-12 shadow-xl bg-white">
+                        <i data-lucide="x-circle" class="w-12 h-12 mb-1"></i>
+                        <div class="text-2xl font-black font-serif uppercase tracking-widest">WRONG</div>
+                    </div>
+                    <div class="mt-8 bg-slate-800 text-white px-6 py-3 rounded font-serif text-lg shadow-lg">
+                        正確答案: <span class="font-bold text-amber-400">${currentQ.variable} = ${currentQ.correctAnswer}</span>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+            feedbackEl.classList.remove('hidden');
+
+            setTimeout(() => {
+                if (state.currentQIndex < state.questions.length - 1) {
+                    state.currentQIndex++;
+                    renderApp();
+                } else {
+                    clearInterval(state.timerInterval);
+                    state.view = 'finished';
+                    renderApp();
+                }
+            }, 2000);
+        }
+
+        async function saveResult() {
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const nameInput = document.getElementById('input-name').value;
+            const saveBtn = document.getElementById('btn-save');
+            const errorDiv = document.getElementById('error-msg');
+
+            if (!nameInput) {
+                errorDiv.innerText = "請輸入姓名";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            let data = {
+                role: role,
+                name: nameInput,
+                difficulty: state.difficulty,
+                score: state.score,
+                timeUsed: state.timer,
+                timestamp: serverTimestamp()
+            };
+
+            if (role === 'teacher') {
+                const pass = document.getElementById('input-pass').value;
+                if (pass !== 'Y123456C') {
+                    errorDiv.innerText = "老師密碼錯誤";
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+                data.classVal = "";
+                data.classNum = "";
+            } else {
+                const y1 = document.getElementById('input-y1').value;
+                const y2 = document.getElementById('input-y2').value;
+                const cls = document.getElementById('input-class').value;
+                const num = document.getElementById('input-num').value;
+                
+                if (!cls || !num) {
+                    errorDiv.innerText = "請輸入班別及學號";
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+                data.year = `20${y1}-20${y2}`;
+                data.classVal = cls;
+                data.classNum = num;
+            }
+
+            saveBtn.innerText = "儲存中...";
+            saveBtn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "leaderboard"), data);
+                state.view = 'welcome';
+                state.leaderboardView = state.difficulty;
+                fetchLeaderboard(); 
+            } catch (e) {
+                console.error(e);
+                errorDiv.innerText = "儲存失敗，請檢查權限設定 (Firestore Rules)";
+                errorDiv.classList.remove('hidden');
+                saveBtn.innerText = "確認儲存 (Save)";
+                saveBtn.disabled = false;
+            }
+        }
+
+        // --- Render Views ---
+
+        function renderLeaderboardRows() {
+            let filteredData = state.leaderboardData.filter(item => item.difficulty === state.leaderboardView);
+            
+            if (state.leaderboardRoleFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.role === state.leaderboardRoleFilter);
+            }
+
+            filteredData.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.timeUsed - b.timeUsed;
+            });
+
+            const displayData = filteredData.slice(0, 50);
+
+            if (displayData.length === 0) {
+                return `<tr><td colspan="4" class="text-center py-8 text-slate-500 italic">此組別暫無紀錄，等你來挑戰！</td></tr>`;
+            }
+
+            const totalQs = state.totalQuestions[state.leaderboardView];
+
+            return displayData.map((entry, index) => {
+                let rankClass = "text-slate-600 font-bold";
+                let badge = "";
+                if (index === 0) { rankClass = "text-amber-600 text-lg"; badge = "🥇"; }
+                else if (index === 1) { rankClass = "text-slate-500 text-lg"; badge = "🥈"; }
+                else if (index === 2) { rankClass = "text-amber-800 text-lg"; badge = "🥉"; }
+
+                const correctCount = Math.round(entry.score / 10); 
+
+                return `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                    <td class="px-6 py-4 ${rankClass}">
+                        ${badge} ${index + 1}
+                    </td>
+                    <td class="px-6 py-4">
+                        ${entry.role === 'teacher' 
+                            ? `<span class="flex items-center text-indigo-700 font-bold"><i data-lucide="school" class="w-4 h-4 mr-2"></i> ${entry.name} <span class="ml-1 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">老師</span></span>`
+                            : `<span class="text-slate-800 font-medium">${entry.classVal} (${entry.classNum}) ${entry.name}</span>`
+                        }
+                    </td>
+                    <td class="px-6 py-4 font-bold font-mono text-emerald-700 text-lg">
+                        ${correctCount} <span class="text-sm text-slate-400 font-normal mx-1">/</span> ${totalQs}
+                    </td>
+                    <td class="px-6 py-4 text-slate-500 font-mono">
+                        ${entry.timeUsed}s
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderWelcome() {
+            const container = document.getElementById('app-container');
+            
+            const buttonsHtml = [
+                { id: 'beginner', title: '初階組', sub: 'Beginner', q: 12, color: 'green' },
+                { id: 'intermediate', title: '中階組', sub: 'Intermediate', q: 10, color: 'amber' },
+                { id: 'advanced', title: '進階組', sub: 'Advanced', q: 8, color: 'red' }
+            ].map(lvl => `
+                <button onclick="window.setDiff('${lvl.id}')" 
+                    class="relative w-full text-left p-5 border-2 rounded-xl transition-all duration-200 group 
+                    ${state.difficulty === lvl.id 
+                        ? `border-slate-800 bg-white shadow-lg transform -translate-y-1` 
+                        : `border-slate-200 bg-white hover:border-${lvl.color}-400 hover:shadow-md`
+                    }">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-xl ${state.difficulty === lvl.id ? 'text-slate-900' : 'text-slate-600'}">
+                                ${lvl.title} <span class="text-sm font-normal text-slate-400 ml-1">${lvl.sub}</span>
+                            </div>
+                            <div class="text-sm text-slate-500 mt-1">共 ${lvl.q} 題</div>
+                        </div>
+                        <div class="${state.difficulty === lvl.id ? 'opacity-100' : 'opacity-0'} transition-opacity">
+                            <i data-lucide="check-circle-2" class="w-6 h-6 text-slate-900"></i>
+                        </div>
+                    </div>
+                    ${state.difficulty === lvl.id ? `<div class="absolute bottom-0 left-0 right-0 h-1.5 bg-${lvl.color}-500 rounded-b-[9px]"></div>` : ''}
+                </button>
+            `).join('');
+
+            const tabsHtml = [
+                { id: 'beginner', label: '初階組榜' },
+                { id: 'intermediate', label: '中階組榜' },
+                { id: 'advanced', label: '進階組榜' }
+            ].map(tab => `
+                <button onclick="window.setLBView('${tab.id}')" 
+                    class="px-6 py-3 font-bold text-sm transition-colors border-b-2 ${
+                        state.leaderboardView === tab.id 
+                        ? 'text-slate-900 border-slate-900 bg-white' 
+                        : 'text-slate-400 border-transparent hover:text-slate-600 hover:bg-slate-50'
+                    }">
+                    ${tab.label}
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="space-y-12">
+                    <section class="max-w-4xl mx-auto text-center space-y-8">
+                        <div class="space-y-4">
+                            <h2 class="text-4xl font-bold text-slate-800">準備好接受挑戰了嗎？</h2>
+                            <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+                                請選擇適合您的難度級別。比賽將測試您對代數方程的理解、運算準確度以及解題速度。所有題目均為即時生成。
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                            ${buttonsHtml}
+                        </div>
+
+                        <button onclick="window.start()" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-slate-900 font-lg rounded-full hover:bg-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900">
+                            <span>開始挑戰</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </section>
+
+                    <section class="max-w-5xl mx-auto">
+                        <div class="bg-white border-2 border-slate-200 shadow-xl rounded-2xl overflow-hidden">
+                            <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-amber-100 p-2 rounded-lg">
+                                        <i data-lucide="trophy" class="text-amber-600 w-5 h-5"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-800">排行榜 (Top 50)</h3>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-slate-500 mr-2">篩選:</span>
+                                    <select onchange="window.setRoleFilter(this.value)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-slate-500">
+                                        <option value="all" ${state.leaderboardRoleFilter === 'all' ? 'selected' : ''}>老師及學生</option>
+                                        <option value="student" ${state.leaderboardRoleFilter === 'student' ? 'selected' : ''}>只看學生</option>
+                                        <option value="teacher" ${state.leaderboardRoleFilter === 'teacher' ? 'selected' : ''}>只看老師</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex border-b border-slate-200 bg-slate-50/50">
+                                ${tabsHtml}
+                            </div>
+
+                            <div class="overflow-x-auto max-h-[600px] custom-scroll bg-white">
+                                <table class="min-w-full text-sm text-left">
+                                    <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider sticky top-0 shadow-sm z-10">
+                                        <tr>
+                                            <th class="px-6 py-3 w-24">排名</th>
+                                            <th class="px-6 py-3">參賽者</th>
+                                            <th class="px-6 py-3">得分 (答對/總題)</th>
+                                            <th class="px-6 py-3">完成時間</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${renderLeaderboardRows()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderPlaying() {
+            const currentQ = state.questions[state.currentQIndex];
+            const container = document.getElementById('app-container');
+            
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto fade-in">
+                    <!-- HUD -->
+                    <div class="flex justify-between items-end mb-4 text-slate-600 border-b-2 border-slate-300 pb-2">
+                        <div class="flex flex-col">
+                            <span class="text-xs uppercase tracking-widest font-bold text-amber-600">Question</span>
+                            <span class="text-3xl font-bold text-slate-800">${state.currentQIndex + 1}<span class="text-lg text-slate-400 font-normal">/${state.questions.length}</span></span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                             <div class="text-xs uppercase tracking-widest font-bold text-slate-400">Time</div>
+                             <div class="flex items-center gap-2 font-mono text-2xl text-slate-800 bg-white px-3 py-1 border border-slate-200 rounded">
+                                <i data-lucide="timer" class="text-amber-600 w-5 h-5"></i>
+                                <span id="timer-display">00:00</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs uppercase tracking-widest font-bold text-slate-400">Score</span>
+                            <span class="text-3xl font-bold text-emerald-700 font-mono">${state.score}</span>
+                        </div>
+                    </div>
+
+                    <!-- Game Board -->
+                    <div class="bg-white shadow-[8px_8px_0px_0px_rgba(30,41,59,0.2)] border-2 border-slate-800 p-8 md:p-12 text-center relative overflow-hidden min-h-[400px] flex flex-col justify-center">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-slate-100">
+                            <div class="h-full bg-amber-500 transition-all duration-300 ease-out" style="width: ${((state.currentQIndex) / state.questions.length) * 100}%"></div>
+                        </div>
+                        
+                        <div class="mb-2 text-slate-500 italic text-sm">Solve for <span class="font-bold text-slate-800">${currentQ.variable}</span></div>
+                        
+                        <div class="my-8 py-8 border-y border-dashed border-slate-200 bg-slate-50/50 text-3xl overflow-x-auto">
+                           \\[${currentQ.latex}\\]
+                        </div>
+
+                        <form onsubmit="window.submitAns(event)" class="mt-8 max-w-sm mx-auto w-full relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                               <span class="font-bold text-xl italic text-slate-400">${currentQ.variable} = </span>
+                            </div>
+                            <input id="answer-input" type="number" placeholder="?" autocomplete="off" class="w-full pl-16 pr-4 py-4 text-left text-3xl font-bold bg-white border-2 border-slate-300 text-slate-800 placeholder-slate-200 focus:border-slate-800 focus:outline-none transition-colors shadow-inner font-serif" autofocus />
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                               <i data-lucide="hash" class="text-slate-200 w-6 h-6"></i>
+                            </div>
+                            <button id="submit-btn" type="submit" class="mt-6 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all">提交答案 (Submit)</button>
+                        </form>
+
+                        <!-- Feedback Overlay -->
+                        <div id="feedback-overlay" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm z-20 fade-in"></div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function renderFinished() {
+            const container = document.getElementById('app-container');
+            const thisYear = new Date().getFullYear();
+            
+            container.innerHTML = `
+                <div class="max-w-2xl mx-auto fade-in">
+                    <div class="bg-white border-2 border-slate-800 shadow-[8px_8px_0px_0px_rgba(30,41,59,1)] p-10 relative">
+                        <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 px-6 py-2 font-bold text-lg shadow-lg border-2 border-slate-800">
+                            成績單 Report Card
+                        </div>
+
+                        <div class="mt-6 text-center border-b-2 border-slate-100 pb-8 mb-8">
+                            <div class="grid grid-cols-2 gap-8 max-w-sm mx-auto">
+                                <div class="text-center">
+                                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Score</div>
+                                    <div class="text-5xl font-mono font-bold text-slate-800">${state.score}</div>
+                                </div>
+                                <div class="text-center border-l border-slate-200">
+                                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Time Used</div>
+                                    <div class="text-5xl font-mono font-bold text-slate-800">${state.timer}<span class="text-lg text-slate-400 ml-1">s</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-center font-bold text-xl text-slate-700 mb-6 flex items-center justify-center gap-2">
+                            <i data-lucide="save" class="w-5 h-5"></i> 登記成績 Record Result
+                        </h3>
+                        
+                        <div class="flex justify-center gap-4 mb-6">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="student" class="peer sr-only" checked onchange="window.toggleRole()">
+                                <div class="px-6 py-3 border-2 border-slate-200 peer-checked:bg-slate-800 peer-checked:text-white peer-checked:border-slate-800 font-bold transition-all rounded hover:border-slate-400">
+                                    <i data-lucide="user" class="inline w-4 h-4 mr-1"></i> 學生 (Student)
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="teacher" class="peer sr-only" onchange="window.toggleRole()">
+                                <div class="px-6 py-3 border-2 border-slate-200 peer-checked:bg-slate-800 peer-checked:text-white peer-checked:border-slate-800 font-bold transition-all rounded hover:border-slate-400">
+                                    <i data-lucide="school" class="inline w-4 h-4 mr-1"></i> 老師 (Teacher)
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="form-container" class="space-y-4 bg-slate-50 p-6 border border-slate-200 mb-6">
+                            <!-- Student Form -->
+                            <div id="student-fields">
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">學年 (Year)</label>
+                                        <div class="flex items-center gap-2 font-mono">
+                                            <input type="number" id="input-y1" value="${thisYear}" class="w-full p-2 border border-slate-300 text-center focus:border-slate-800 outline-none">
+                                            <span>-</span>
+                                            <input type="number" id="input-y2" value="${thisYear+1}" class="w-full p-2 border border-slate-300 text-center focus:border-slate-800 outline-none">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">姓名 (Name)</label>
+                                        <input type="text" id="input-name" placeholder="e.g. Chan Tai Man" class="w-full p-2 border border-slate-300 focus:border-slate-800 outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">班別 (Class)</label>
+                                        <select id="input-class" class="w-full p-2 border border-slate-300 focus:border-slate-800 outline-none bg-white font-mono">
+                                            <option value="">--</option>
+                                            <option value="1A">1A</option>
+                                            <option value="1B">1B</option>
+                                            <option value="1C">1C</option>
+                                            <option value="1D">1D</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">學號 (No.)</label>
+                                        <input type="number" id="input-num" placeholder="e.g. 15" class="w-full p-2 border border-slate-300 focus:border-slate-800 outline-none font-mono">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Teacher Fields (Hidden by default) -->
+                            <div id="teacher-fields" class="hidden">
+                                <div class="mb-4">
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">老師姓名 (Name)</label>
+                                    <input type="text" id="input-t-name" oninput="document.getElementById('input-name').value = this.value" placeholder="e.g. Mr. Wong" class="w-full p-2 border border-slate-300 focus:border-slate-800 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">密碼 (Access Code)</label>
+                                    <input type="password" id="input-pass" placeholder="••••••••" class="w-full p-2 border border-slate-300 focus:border-slate-800 outline-none font-mono">
+                                </div>
+                            </div>
+                            
+                            <div id="error-msg" class="hidden text-red-600 text-sm font-bold bg-red-50 p-2 border border-red-200 text-center"></div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button onclick="window.discard()" class="flex-1 py-3 border-2 border-slate-300 text-slate-500 font-bold hover:border-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 放棄 (Discard)
+                            </button>
+                            <button id="btn-save" onclick="window.save()" class="flex-1 py-3 bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50">
+                                <i data-lucide="save" class="w-4 h-4"></i> 確認儲存 (Save)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderApp() {
+            if (state.view === 'welcome') renderWelcome();
+            else if (state.view === 'playing') renderPlaying();
+            else if (state.view === 'finished') renderFinished();
+        }
+
+        // --- Window Exports for HTML Events ---
+        window.setDiff = (d) => { 
+            state.difficulty = d; 
+            renderWelcome(); 
+        };
+        window.setLBView = (d) => {
+            state.leaderboardView = d;
+            renderWelcome(); 
+        };
+        window.setRoleFilter = (filter) => {
+            state.leaderboardRoleFilter = filter;
+            renderWelcome(); 
+        };
+        window.start = () => { startGame(); };
+        window.submitAns = (e) => { submitAnswer(e); };
+        window.discard = () => { state.view = 'welcome'; renderApp(); };
+        window.save = () => { saveResult(); };
+        window.toggleRole = () => {
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const sFields = document.getElementById('student-fields');
+            const tFields = document.getElementById('teacher-fields');
+            if(role === 'teacher') {
+                sFields.classList.add('hidden');
+                tFields.classList.remove('hidden');
+            } else {
+                sFields.classList.remove('hidden');
+                tFields.classList.add('hidden');
+            }
+        };
+
+        // --- Init ---
+
+    </script>
+</body>
+</html>
